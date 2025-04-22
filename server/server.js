@@ -9,6 +9,7 @@ const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
 
 const initializePassport = require('./middlewares/passport-config');
 initializePassport(passport);
@@ -25,6 +26,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/auth', authRoutes);
+
+app.use('/user', userRoutes);
 
 app.get('/', (req, res) => {
     res.render('../views/index.ejs')

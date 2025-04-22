@@ -22,11 +22,13 @@ async function registerUser({ email, password, first_name, last_name, phone_numb
 
 async function findUserByEmail(email) {
   const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+  if (!result.rows[0]) return null;
   return result.rows[0];
 }
 
 async function findUserById(id) {
   const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
+  if (!result.rows[0]) return null;
   return result.rows[0];
 }
 
