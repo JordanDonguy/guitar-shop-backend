@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const { registerUser, findUserByEmail } = require('../models/userModels');
+const { checkAuthenticatd, checkNotAuthenticated} = require('../middlewares/checkAuth');
 
 // Register route
 
@@ -43,21 +44,5 @@ router.post('/logout', function(req, res, next){
       res.redirect('/auth/login');
     });
   });
-
-// Already authenticated check functions
-
-function checkAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next()
-    }
-    res.redirect('/login')
-};
-
-function checkNotAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return res.redirect('/')
-    }
-    next()
-}
 
 module.exports = router;

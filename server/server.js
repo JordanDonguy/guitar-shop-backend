@@ -10,7 +10,7 @@ const flash = require('express-flash');
 const session = require('express-session');
 const authRoutes = require('./routes/auth');
 
-const initializePassport = require('./passport-config');
+const initializePassport = require('./middlewares/passport-config');
 initializePassport(passport);
 
 app.set('view-engine', 'ejs');
