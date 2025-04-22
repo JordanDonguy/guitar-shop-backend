@@ -1,8 +1,20 @@
 <h1>Register</h1>
-<form action="/register" method="POST">
+<% if (typeof error !== 'undefined') { %>
+    <div class="error"><%= error %></div>
+<% } %>  
+<br>
+<form action="/auth/register" method="POST">
     <div>
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" required>
+        <label for="first_name">First Name</label>
+        <input type="text" id="first_name" name="first_name" required>
+    </div>
+    <div>
+        <label for="last_name">Last Name</label>
+        <input type="text" id="last_name" name="last_name" required>
+    </div>
+    <div>
+        <label for="phone_number">Phone Number</label>
+        <input type="text" id="phone_name" name="phone_number" required>
     </div>
     <div>
         <label for="email">Email</label>
@@ -14,4 +26,4 @@
     </div>
     <button type="submit">Register</button>
 </form>
-<a href="/login">Login</a>
+<a href="/auth/login">Login</a>
