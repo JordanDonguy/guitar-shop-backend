@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Filtered Products</title>
+  <style>
+    .title {
+      width: 100%;
+      display: inline-flex;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    .product-card {
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px;
+      width: 420px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .product-image {
+      width: 400px;
+      height: 400px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .availabilityPrice {
+      display: inline-flex;
+      width: 400px;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .availability {
+      font-weight: bold;
+    }
+    .available {
+      color: green;
+    }
+    .unavailable {
+      color: red;
+    }
+    .price {
+      font-weight: bold;
+      font-size: 1.2rem
+    }
+  </style>
+</head>
+<body>
+  <div class="title"><h1>Products</h1></div>
+  <div style="display: flex; flex-wrap: wrap;">
+    <% products.forEach(product => { %>
+      <div class="product-card">
+        <img src="<%= product.image_url %>" alt="<%= product.name %>" class="product-image" />
+        <h2><%= product.brand %> - <%= product.name %></h2>
+        <div><%- product.description_html %></div> <!-- Rendered markdown (as HTML) -->
+        <div class="availabilityPrice">
+            <div class="availability <%= product.stock > 0 ? 'available' : 'unavailable' %>">
+              <%= product.stock > 0 ? '● Available' : '● Out of stock' %>
+            </div>
+            <div class="price"><%= product.price %> €</div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</body>
+</html>

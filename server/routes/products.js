@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getFilteredProducts, getProductById } = require('../models/productsModels');
+const marked = require('marked');
+const { getFilteredProducts, getProductById, convertToEmbedUrl } = require('../models/productsModels');
 const { getAllCategories } = require('../models/categoriesModels');
 
 router.get('/', async (req, res) => {
@@ -32,8 +33,8 @@ router.get('/category/:id', async (req, res) => {
       inStockOnly,
       sortOrder
     });
-
-    res.json(products);
+      
+    res.render('products.ejs', { products });
 
   } catch (error) {
     console.error('GET /products/category/:id error:', error);
@@ -43,8 +44,19 @@ router.get('/category/:id', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     try {
-        const product = await getProductById(req.params.id);
-        res.status(200).json(product)
+        const rawProduct = await getProductById(req.params.id);
+        const product = Array.isArray(rawProduct) ? rawProduct[0] : rawProduct;
+
+        const rawVideoUrl = product.video_url;
+
+        const productData = {
+            ...product,
+            description_html: marked.parse(product.description || ''),
+            video_url: convertToEmbedUrl(rawVideoUrl)
+        }; 
+
+        res.render('product.ejs', { product: productData });
+
     } catch (error) {
         console.error('GET /products/:id:', error);
         res.status(500).json({ error: 'Internal server error' });

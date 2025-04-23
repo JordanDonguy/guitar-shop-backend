@@ -72,4 +72,9 @@ async function getProductById(id) {
     }
 };
 
-module.exports = { getFilteredProducts, getProductById }
+function convertToEmbedUrl(url) {
+    if (!url) return '';
+    return url.replace('watch?v=', 'embed/');
+  }
+
+module.exports = { getFilteredProducts, getProductById, convertToEmbedUrl }
