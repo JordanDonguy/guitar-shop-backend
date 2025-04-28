@@ -6,7 +6,7 @@ const { registerUser, findUserByEmail } = require('../models/userModels');
 const { checkAuthenticatd, checkNotAuthenticated} = require('../middlewares/checkAuth');
 const { registerAddress } = require('../models/addressModels');
 const { getAllCountries } = require('../models/countryModels');
-const { getCartByUserId, getItemsByCartId, saveUserCart } = require('../models/cartModels');
+const { getCartByUserId, getItemsByCartId, saveUserCart, createCart } = require('../models/cartModels');
 
 // Register route
 
@@ -37,6 +37,8 @@ router.post('/register', checkNotAuthenticated, async (req, res) => {
         }
 
         const newAddress = await registerAddress(addressData);
+
+        const newCart = await createCart(newUser.id);
 
         res.redirect('/auth/login');
     } catch (err) {

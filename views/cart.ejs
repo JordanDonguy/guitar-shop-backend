@@ -112,7 +112,10 @@
         <% }) %>
     </div>
     <div class="globalCartSection">
-      <button id="clearCartButton">Clear Cart</button>
+      <form action="/cart/delete" method="POST">
+        <input type="hidden" name="clear-cart" value="<%= cart_id %>">
+        <button type="submit" id="clearCartButton">Clear Cart</button>
+      </form>
       <div class="final-price">Total price : <%= Number(final_price).toFixed(2) %> €</div>
     </div>
     <% } else { %>

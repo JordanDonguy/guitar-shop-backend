@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId } = require('../models/cartModels');
+const { getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId, deleteAllFromCart } = require('../models/cartModels');
 const { checkAuthenticated, checkNotAuthenticated } = require('../middlewares/checkAuth');
 
 router.get('/', async (req, res) => {
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
                 const price = parseFloat(item.total_price);  // Convert to number if it's a string
                 return acc + price;
             }, 0);
-            res.render('cart.ejs', { products: cartItems, isAuthenticated: req.isAuthenticated(), final_price: finalPrice });
+            res.render('cart.ejs', { products: cartItems, isAuthenticated: req.isAuthenticated(), final_price: finalPrice, cart_id: cart.id });
         } else {
             res.render('cart.ejs', { isAuthenticated: req.isAuthenticated() });
         };
@@ -58,6 +58,17 @@ router.post('/addOne', (req, res) => {
         res.status(200).redirect('/cart')
     } catch (error) {
         console.error('POST /cart/addOne', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post('/delete', async (req, res) => {
+    try {
+        const cartId = req.body['clear-cart'];
+        await deleteAllFromCart(cartId);
+        res.status(204).redirect('/cart')
+    } catch (error) {
+        console.error('POST /cart/delete', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

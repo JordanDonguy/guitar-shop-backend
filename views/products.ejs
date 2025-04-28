@@ -142,16 +142,14 @@
           if (existingItem) {
             existingItem.quantity += 1;
           } else {
-            cart.push({ product_id: productId, quantity: 1, brand: productBrand, name: productName, image_url: imgSrc, price: productPrice });
+            cart.push({ product_id: product_id, quantity: 1, brand: productBrand, name: productName, image_url: imgSrc, price: productPrice });
           }
   
           // Save back to localStorage
           localStorage.setItem('cart', JSON.stringify(cart));
-  
-          // Optionally show an alert
+
           alert('Item added to cart!');
         }
-        // Else, if user is logged in, allow form to submit normally
       });
     });
   });

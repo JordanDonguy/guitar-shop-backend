@@ -1,8 +1,23 @@
 const pool = require('../db/index');
 
+async function createCart(user_id) {
+    try {
+        let query = `
+        INSERT INTO shopping_cart (user_id)
+        VALUES ($1)
+        ON CONFLICT (user_id)
+        DO NOTHING
+        `;
+
+        const result = await pool.query(query, [user_id]);
+        return result.rows[0]
+    } catch (error) {
+        console.error('Error creating cart : ', error);
+        throw error;
+    }
+}
 
 async function getCartByUserId(user_id) {
-
     try {
         let query = `
         SELECT  id
@@ -148,6 +163,10 @@ async function saveUserCart(cartId, userCart) {
         await pool.query(query, [cartId, item.product_id, item.quantity]
         );
     }
-}
+};
 
-module.exports = { getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId, saveUserCart };
+async function deleteAllFromCart(cartId) {
+    await pool.query('DELETE FROM cart_items WHERE cart_id = $1', [cartId]);
+};
+
+module.exports = { createCart, getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId, saveUserCart, deleteAllFromCart };
