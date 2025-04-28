@@ -8,7 +8,10 @@ router.get('/', async (req, res) => {
         if (req.isAuthenticated()) {
             const cart = await getCartByUserId(req.user.id);
             const cartItems = await getItemsByCartId(cart.id);
-            const finalPrice = cartItems.reduce((acc, item) => {return acc + item.total_price});
+            const finalPrice = cartItems.reduce((acc, item) => {
+                const price = parseFloat(item.total_price);  // Convert to number if it's a string
+                return acc + price;
+            }, 0);
             res.render('cart.ejs', { products: cartItems, isAuthenticated: req.isAuthenticated(), final_price: finalPrice });
         } else {
             res.render('cart.ejs', { isAuthenticated: req.isAuthenticated() });
@@ -29,25 +32,34 @@ router.post('/add/:id', async (req, res) => {
             res.status(201).redirect('/cart');
         } else {
             const newItem = await addItemToCart(cart.id, req.body.product_id, 1);
-            console.log(newItem)
             res.status(201).redirect('/cart');
         }
     } catch (error) {
-
+        console.error('POST /cart/add/:id', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-router.patch('/update/:id', async (req, res) => {
+router.post('/removeOne', (req, res) => {
     try {
-        const cart = await getCartByUserId(req.user.id);
-        const cartItems = await getItemsByCartId(cart.id);
-        const itemToUpdate = await cartItems.find(item => item.product_id == req.body.product_id);
-
-        const itemUpdated  = await updateItemInCart(itemToUpdate.id, 1);
-        res.status(201).redirect('/cart');
+        const { itemId } = req.body;
+        updateItemInCart(itemId, -1);
+        res.status(200).redirect('/cart')
     } catch (error) {
-
+        console.error('POST /cart/removeOne', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-})
+});
+
+router.post('/addOne', (req, res) => {
+    try {
+        const { itemId } = req.body;
+        updateItemInCart(itemId, 1);
+        res.status(200).redirect('/cart')
+    } catch (error) {
+        console.error('POST /cart/addOne', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 module.exports = router;
