@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const marked = require('marked');
-const { getFilteredProducts, getProductById, convertToEmbedUrl } = require('../models/productsModels');
+const { getFilteredProducts, getProductById, convertToEmbedUrl, getAllProducts } = require('../models/productsModels');
 const { getAllCategories } = require('../models/categoriesModels');
 
 router.get('/', async (req, res) => {
@@ -13,6 +13,16 @@ router.get('/', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 })
+
+router.get('/all', async (req, res) => {
+  try {
+    const products = await getAllProducts();
+    res.render('products.ejs', { products, isAuthenticated: req.isAuthenticated() });
+  } catch (error) {
+    console.error('GET /products/all', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 router.get('/category/:id', async (req, res) => {
   try {
@@ -34,7 +44,7 @@ router.get('/category/:id', async (req, res) => {
       sortOrder
     });
       
-    res.render('products.ejs', { products });
+    res.render('products.ejs', { products, isAuthenticated: req.isAuthenticated() });
 
   } catch (error) {
     console.error('GET /products/category/:id error:', error);
