@@ -134,4 +134,20 @@ async function updateItemInCart(id, quantity) {
     }
 };
 
-module.exports = { getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId };
+async function saveUserCart(cartId, userCart) {
+    // First, clear the user's existing cart (if necessary)
+    await pool.query('DELETE FROM cart_items WHERE cart_id = $1', [cartId]);
+
+    // Now insert the updated cart items
+    for (const item of userCart) {
+        let query = `
+        INSERT INTO 
+        cart_items (cart_id, product_id, quantity) 
+        VALUES ($1, $2, $3)
+        `
+        await pool.query(query, [cartId, item.product_id, item.quantity]
+        );
+    }
+}
+
+module.exports = { getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId, saveUserCart };

@@ -11,3 +11,10 @@
 <form action="/auth/logout" method="POST">
     <button type="submit">Log Out</button>
 </form>
+
+<script>
+    const isAuthenticated = <%= JSON.stringify(isAuthenticated) %>;
+    if (isAuthenticated) {
+        localStorage.removeItem('cart');
+    }
+</script>

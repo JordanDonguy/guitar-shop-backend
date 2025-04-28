@@ -36,7 +36,7 @@ app.use('/products', productsRoutes);
 app.use('/cart' , cartRoutes);
 
 app.get('/', (req, res) => {
-    res.render('../views/index.ejs')
+    res.render('../views/index.ejs', { isAuthenticated: req.isAuthenticated() })
 })
 
 app.listen(3000);

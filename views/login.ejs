@@ -1,16 +1,35 @@
-<h1>Login</h1>
-<% if (messages.error) { %>
-    <%= messages.error %>
-<% } %>
-<form action="/auth/login" method="POST">
-    <div>
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required>
-    </div>
-    <div>
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
-    </div>
-    <button type="submit">Login</button>
-</form>
-<a href="/auth/register">Register</a>
+<html>
+
+<body>
+    <h1>Login</h1>
+    <% if (messages.error) { %>
+        <%= messages.error %>
+            <% } %>
+                <form action="/auth/login" method="POST" id="login-form">
+                    <div>
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div>
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <div>
+                        <input type="hidden" name="temporaryCart" value="" id="temporary-cart">
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+                <a href="/auth/register">Register</a>
+</body>
+
+<script>
+    const form = document.getElementById('login-form');
+    const tempCartInput = document.getElementById('temporary-cart');
+
+    form.addEventListener('submit', function (event) {
+        const cart = localStorage.getItem('cart') || '[]';
+        tempCartInput.value = cart;
+    });
+</script>
+
+</html>

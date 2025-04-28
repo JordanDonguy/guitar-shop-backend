@@ -127,7 +127,7 @@
         if (!isAuthenticated) {
           e.preventDefault(); // prevent the form from submitting to server
   
-          const productId = this.querySelector('button[name="product_id"]').value;
+          const product_id = this.querySelector('button[name="product_id"]').value;
           const productBrand = this.closest('.description-box').querySelector('.product-brand').textContent;
           const productName = this.closest('.description-box').querySelector('.product-name').textContent;
           const imgSrc = this.closest('.product-card').querySelector('.product-image').getAttribute('src');
@@ -137,12 +137,12 @@
           let cart = JSON.parse(localStorage.getItem('cart')) || [];
   
           // Check if product is already in cart
-          const existingItem = cart.find(item => item.productId === productId);
+          const existingItem = cart.find(item => item.product_id === product_id);
   
           if (existingItem) {
             existingItem.quantity += 1;
           } else {
-            cart.push({ productId: productId, quantity: 1, brand: productBrand, name: productName, image_url: imgSrc, price: productPrice });
+            cart.push({ product_id: productId, quantity: 1, brand: productBrand, name: productName, image_url: imgSrc, price: productPrice });
           }
   
           // Save back to localStorage

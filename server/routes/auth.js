@@ -6,6 +6,7 @@ const { registerUser, findUserByEmail } = require('../models/userModels');
 const { checkAuthenticatd, checkNotAuthenticated} = require('../middlewares/checkAuth');
 const { registerAddress } = require('../models/addressModels');
 const { getAllCountries } = require('../models/countryModels');
+const { getCartByUserId, getItemsByCartId, saveUserCart } = require('../models/cartModels');
 
 // Register route
 
@@ -50,11 +51,51 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
     res.render('login.ejs')
 });
 
-router.post('/login', checkNotAuthenticated, passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/auth/login',
-    failureFlash: true
-}));
+router.post('/login', checkNotAuthenticated, (req, res, next) => {
+    passport.authenticate('local', async (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        return res.redirect('/auth/login'); // If login failed
+      }
+  
+      req.logIn(user, async (err) => {
+        if (err) {
+          return next(err);
+        }
+  
+        try {
+          // Now user is logged in successfully
+          const temporaryCart = JSON.parse(req.body.temporaryCart); // cart sent from the client
+          const cart = await getCartByUserId(user.id);
+          const cartItems = await getItemsByCartId(cart.id);
+
+          temporaryCart.forEach(item => {
+            // Check if the item already exists in the user's cart
+            const existingItem = cartItems.find(cartItem => cartItem.product_id == item.product_id);
+  
+            if (existingItem) {
+              existingItem.quantity += item.quantity;
+            } else {
+              cartItems.push({
+                product_id: item.product_id,
+                quantity: item.quantity
+              });
+            }
+          });
+          // Save the updated cart back to the database
+          await saveUserCart(cart.id, cartItems);
+
+          return res.redirect('/'); // success redirect after merge
+        } catch (error) {
+          console.error(error);
+          return res.status(500).send('An error occurred while merging the cart.');
+        }
+      });
+    })(req, res, next); // <-- call passport.authenticate immediately
+  });
+  
 
 // Logout route
 
