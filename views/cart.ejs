@@ -8,6 +8,14 @@
       margin: 0px 25%;
     }
 
+    a {
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+      color: black;
+    }
+
     #clearCartButton {
       background-color: red;
       color: white;
@@ -49,8 +57,11 @@
       justify-content: space-evenly;
     }
 
-    .product-name {
-      font-size: 1.3rem;
+    .product-name h1 {
+      font-size: 1.4rem;
+      font-weight: 300;
+      text-decoration: none;
+      color: black;
     }
 
     .quantity-button {
@@ -90,9 +101,9 @@
             <h1>
               <%= product.brand %>
             </h1>
-            <h1 class="product-name">
-              <%= product.name %>
-            </h1>
+            <a class="product-name" href="/products/<%= product.product_id %>">
+              <h1><%= product.name %></h1> 
+            </a>
             <div class="price">Unit price : <%= Number(product.price).toFixed(2) %> €</div>
             <div class="quantity">
               <span>Quantity : </span>
@@ -183,7 +194,9 @@
               <img src="${product.image_url}" alt="${product.name}" class="product-image" />
               <div class="description-box">
                 <h1>${product.brand}</h1>
-                <h1 class="product-name">${product.name}</h1>
+                <a class="product-name" href="/products/${product.product_id}">
+                  <h1>${product.name}</h1>
+                </a>
                 <div class="price">Unit price : ${Number(product.price).toFixed(2)} €</div>
                 <div class="quantity">
                   <span>Quantity : </span>

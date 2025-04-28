@@ -102,7 +102,7 @@
         <div class="product-info">
           <h1 class="product-brand"><%= product.brand %></h1>
           <h1 class="product-name"><%= product.name %></h1>
-          <div class="price">$<%= Number(product.price).toFixed(2) %></div>
+          <div class="price"><%= Number(product.price).toFixed(2) %></div>
           <div class="availability <%= product.stock > 0 ? 'available' : 'unavailable' %>">
             <%= product.stock > 0 ? '● Available' : '● Out of Stock' %>
           </div>
