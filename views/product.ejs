@@ -100,16 +100,20 @@
         <img src="<%= product.image_url2 %>" alt="<%= product.name %>" class="product-image" />
         
         <div class="product-info">
-          <h1><%= product.brand %></h1>
-          <h1><%= product.name %></h1>
+          <h1 class="product-brand"><%= product.brand %></h1>
+          <h1 class="product-name"><%= product.name %></h1>
           <div class="price">$<%= Number(product.price).toFixed(2) %></div>
           <div class="availability <%= product.stock > 0 ? 'available' : 'unavailable' %>">
             <%= product.stock > 0 ? '● Available' : '● Out of Stock' %>
           </div>
       
 
-          <form action="/cart/add/<%= product.id %>" method="post">
-            <button type="submit" class="add-to-cart" <%= product.stock === 0 ? 'disabled' : '' %>>
+          <form action="/cart/add/<%= product.id %>" method="post" class="add-to-cart-form">
+            <button type="submit" 
+            class="add-to-cart" 
+            name="product_id"
+            value="<%= product.id  %>"
+            <%= product.stock === 0 ? 'disabled' : '' %>>
               Add to Cart
             </button>
           </form>
@@ -130,4 +134,37 @@
   </div>
 
 </body>
+<script>
+  const isAuthenticated = <%= JSON.stringify(isAuthenticated) %>;
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('.add-to-cart-form');
+  
+    form.addEventListener('submit', function(e) {
+      if (!isAuthenticated) {
+        e.preventDefault(); // prevent the form from submitting to server
+        const product_id = document.querySelector('button[name="product_id"]').value;
+        const productBrand = document.querySelector('.product-brand').textContent;
+        const productName = document.querySelector('.product-name').textContent;
+        const imgSrc = document.querySelector('.product-image').getAttribute('src');
+        const productPrice = document.querySelector('.price').textContent;
+
+        // Get the cart from localStorage (or create a new one)
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Check if product is already in cart
+        const existingItem = cart.find(item => item.product_id === product_id);
+
+        if (existingItem) {
+          existingItem.quantity += 1;
+        } else {
+          cart.push({ product_id: product_id, quantity: 1, brand: productBrand, name: productName, image_url: imgSrc, price: productPrice });
+        }
+
+        // Save back to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert('Item added to cart!');
+      }
+    });
+    });
+</script>
 </html>

@@ -75,6 +75,7 @@ async function getProductById(id) {
     try {
         let query = `
         SELECT 
+          products.id AS id,
           brands.name AS brand,
           products.name,
           products.description,

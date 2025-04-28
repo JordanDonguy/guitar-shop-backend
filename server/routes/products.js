@@ -65,7 +65,7 @@ router.get('/:id', async (req, res) => {
             video_url: convertToEmbedUrl(rawVideoUrl)
         }; 
 
-        res.render('product.ejs', { product: productData });
+        res.render('product.ejs', { product: productData, isAuthenticated: req.isAuthenticated() });
 
     } catch (error) {
         console.error('GET /products/:id:', error);
