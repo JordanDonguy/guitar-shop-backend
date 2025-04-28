@@ -12,6 +12,7 @@
       display: flex;
       gap: 40px;
       margin-bottom: 40px;
+      max-height: 500px;
     }
 
     .firstSection {
@@ -22,9 +23,10 @@
     }
 
     .product-image {
-      width: 50%;
-      height: 400px;
-      object-fit: cover;
+      max-width: 50%;
+      height: 100%;
+      padding: 0px 50px;
+      object-fit: contain;
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
@@ -64,11 +66,15 @@
       cursor: pointer;
       margin-top: 20px;
     }
+    .add-to-cart:hover {
+      background-color: #41b75c;
+    }
 
     .description {
       margin-bottom: 40px;
       width: 70%;
-      margin-left: 15%
+      margin-left: 15%;
+      line-height: 1.5;
     }
 
     .video-section {

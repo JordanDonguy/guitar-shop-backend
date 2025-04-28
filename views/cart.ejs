@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+
+<head>
+  <title>Cart</title>
+  <style>
+    body {
+      width: 50%;
+      margin: 0px 25%;
+    }
+
+    #clearCartButton {
+      background-color: red;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+
+    #clearCartButton:hover {
+      background-color: darkred;
+    }
+
+    .product-card {
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0px;
+
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+    }
+
+    .product-image {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .description-box {
+      height: 220px;
+      width: 70%;
+      margin-left: 5%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+    }
+
+    .product-name {
+      font-size: 1.3rem;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .globalCartSection {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 50px 0px;
+      width: 100%;
+    }
+
+    .final-price {
+      font-size: 1.8rem;
+    }
+  </style>
+</head>
+
+<body>
+  <% if (isAuthenticated) { %>
+    <div>
+      <% products.forEach(product=> { %>
+        <div class="product-card">
+          <img src="<%= product.image_url %>" alt="<%= product.name %>" class="product-image" />
+          <div class="description-box">
+            <h1>
+              <%= product.brand %>
+            </h1>
+            <h1 class="product-name">
+              <%= product.name %>
+            </h1>
+            <div class="price">Unit price : <%= Number(product.price).toFixed(2) %> €</div>
+            <div class="quantity">Quantity : <%= Number(product.quantity).toFixed(0) %>
+            </div>
+            <div class="total-price">Total price : <%= Number(product.total_price).toFixed(2) %> €</div>
+          </div>
+        </div>
+        <% }) %>
+    </div>
+    <div class="final-price">Total price : <%= Number(final_price).toFixed(2) %> €</div>
+    <% } else { %> 
+      <div id="guest-cart">
+      </div>
+      <div class="globalCartSection">
+        <button id="clearCartButton">Clear Cart</button>
+        <div class="final-price">Total price : 0 €</div>
+      </div>
+      <% } %>
+
+        <script>
+          const isAuthenticated = <%= JSON.stringify(isAuthenticated) %>;
+
+          if (!isAuthenticated) {
+            // Guest user - load cart from localStorage
+            const guestCart = JSON.parse(localStorage.getItem('cart')) || [];
+            const guestCartContainer = document.getElementById('guest-cart');
+
+            // Clear the cart from localStorage
+            document.getElementById('clearCartButton').addEventListener('click', function () {
+              localStorage.removeItem('cart');
+              alert('Your cart has been cleared.');
+            });
+
+            if (guestCart.length === 0) {
+              guestCartContainer.innerHTML = '<h2>Your cart is empty.</h2>';
+            } else {
+              let finalPrice = 0;
+              guestCart.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+
+                productCard.innerHTML = `
+              <img src="${product.image_url}" alt="${product.name}" class="product-image" />
+              <div class="description-box">
+                <h1>${product.brand}</h1>
+                <h1 class="product-name">${product.name}</h1>
+                <div class="price">Unit price : ${Number(product.price).toFixed(2)} €</div>
+                <div class="quantity">Quantity : ${Number(product.quantity).toFixed(0)}</div>
+                <div class="total-price">Total price : ${(Number(product.price) * product.quantity).toFixed(2)} €</div>
+              </div>
+            `;
+
+                guestCartContainer.appendChild(productCard);
+                finalPrice += (product.price * product.quantity);
+              });
+              document.querySelector('.final-price').textContent = 'Total Price : ' + finalPrice.toFixed(2) + ' €';
+            }
+          }
+        </script>
+
+</body>
+
+</body>
