@@ -32,8 +32,20 @@ async function findAddressByUserId(user_id) {
     return result.rows[0] || null;
 }
 
+// Find Address ID by user ID
+async function getAddressId(user_id) {
+    try {
+        const result = await pool.query(`SELECT id FROM address WHERE user_id = $1`, [user_id]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error fetching address id : ', error);
+        throw error;
+    }
+};
+
 module.exports = {
     registerAddress,
     findAddressById,
-    findAddressByUserId
+    findAddressByUserId,
+    getAddressId
 };
