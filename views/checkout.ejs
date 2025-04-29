@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .checkout-form {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    .checkout-form h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #111827;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #374151;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      box-sizing: border-box;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    .submit-btn {
+      width: 100%;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .submit-btn:hover {
+      background-color: #2563eb;
+    }
+    .card-icons {
+      text-align: right;
+      margin-bottom: 1rem;
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+    .error {
+        background-color: #fee2e2;
+    color: #991b1b;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <form class="checkout-form" action="/checkout" method="POST">
+    <h2>Payment Details</h2>
+    
+    <div class="card-icons">
+      <span>Accepted: 💳 💰 🧾</span>
+    </div>
+
+    <% if (typeof error !=='undefined' ) { %>
+        <div class="error">
+            <%= error %>
+        </div>
+    <% } %>
+
+    <div class="form-group">
+      <label for="cardNumber">Card Number</label>
+      <input type="text" id="cardNumber" name="cardNumber" placeholder="4242 4242 4242 4242" required>
+    </div>
+
+    <div class="form-group">
+      <label for="expiry">Expiry Date</label>
+      <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required>
+    </div>
+
+    <div class="form-group">
+      <label for="cvv">CVV</label>
+      <input type="text" id="cvv" name="cvv" placeholder="123" required>
+    </div>
+    <input type="hidden" name="cart_id" value="<%= cart_id %>">
+    <input type="hidden" name="total_price" value="<%= total_price %>">
+
+    <button type="submit" class="submit-btn">Pay Now</button>
+  </form>
+
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // card number input
+      const cardInput = document.getElementById('cardNumber');
+
+      cardInput.addEventListener('input', (e) => {
+        let value = cardInput.value.replace(/\D/g, ''); // Remove non-digits
+  
+        if (value.length >= 15) {
+          value = value.slice(0, 16); // max 16 digits
+        };
+
+        cardInput.value = value;
+      });
+
+
+      // expiry input
+      const expiryInput = document.getElementById('expiry');
+  
+      expiryInput.addEventListener('input', (e) => {
+        let value = expiryInput.value.replace(/\D/g, ''); // Remove non-digits
+  
+        if (value.length >= 3) {
+          value = value.slice(0, 4); // max 4 digits
+          value = value.replace(/(\d{2})(\d{1,2})/, '$1/$2');
+        }
+  
+        expiryInput.value = value;
+      });
+  
+      expiryInput.addEventListener('blur', () => {
+        // Auto-format on blur (e.g., if only MM entered)
+        let value = expiryInput.value.replace(/\D/g, '');
+        if (value.length === 2) {
+          expiryInput.value = value + '/';
+        }
+      });
+
+
+      // cvv input
+      const cvvInput = document.getElementById('cvv');
+
+      cvvInput.addEventListener('input', (e) => {
+        let value = cvvInput.value.replace(/\D/g, ''); // Remove non-digits
+  
+        if (value.length >= 2) {
+          value = value.slice(0, 3); // max 16 digits
+        };
+
+        cvvInput.value = value;
+      });
+
+    });
+  </script>  
+</html>

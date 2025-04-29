@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId, deleteAllFromCart } = require('../models/cartModels');
+const { getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId, clearCart } = require('../models/cartModels');
 const { checkAuthenticated, checkNotAuthenticated } = require('../middlewares/checkAuth');
 
 router.get('/', async (req, res) => {
@@ -62,10 +62,10 @@ router.post('/addOne', (req, res) => {
     }
 });
 
-router.post('/delete', async (req, res) => {
+router.post('/clearCart', async (req, res) => {
     try {
         const cartId = req.body['clear-cart'];
-        await deleteAllFromCart(cartId);
+        await clearCart(cartId);
         res.status(204).redirect('/cart')
     } catch (error) {
         console.error('POST /cart/delete', error);

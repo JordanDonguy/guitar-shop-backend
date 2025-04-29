@@ -16,20 +16,6 @@
       color: black;
     }
 
-    #clearCartButton {
-      background-color: red;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      border-radius: 10px;
-    }
-
-    #clearCartButton:hover {
-      background-color: darkred;
-    }
-
     .product-card {
       border: 1px solid #ccc;
       border-radius: 12px;
@@ -85,10 +71,40 @@
       width: 100%;
     }
 
+    #clearCartButton {
+      background-color: red;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+
+    #clearCartButton:hover {
+      background-color: rgb(255, 80, 80);
+    }
+
     .final-price {
       font-size: 1.8rem;
     }
-  </style>
+
+    #checkout-button {
+      background-color: rgb(0, 128, 68);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 10px;
+      float: right;
+      width: 250px;
+    }
+
+    #checkout-button:hover {
+      background-color: rgb(0, 163, 87);
+    }
+   </style>
 </head>
 
 <body>
@@ -123,11 +139,18 @@
         <% }) %>
     </div>
     <div class="globalCartSection">
-      <form action="/cart/delete" method="POST">
+      <form action="/cart/clearCart" method="POST">
         <input type="hidden" name="clear-cart" value="<%= cart_id %>">
         <button type="submit" id="clearCartButton">Clear Cart</button>
       </form>
       <div class="final-price">Total price : <%= Number(final_price).toFixed(2) %> €</div>
+    </div>
+    <div class="checkout">
+      <form action="/checkout/initiate" method="POST">
+        <input type="hidden" name="cart_id" value="<%= cart_id %>">
+        <input type="hidden" name="total_price" value="<%= Number(final_price).toFixed(2) %>">
+        <button type="submit" id="checkout-button">Checkout</button>
+      </form>
     </div>
     <% } else { %>
       <div id="guest-cart">
@@ -135,6 +158,12 @@
       <div class="globalCartSection">
         <button id="clearCartButton">Clear Cart</button>
         <div class="final-price">Total price : 0 €</div>
+      </div>
+      <div class="checkout">
+        <form action="/checkout" method="GET">
+          <input type="hidden" name="checkout">
+          <button type="submit" id="checkout-button">Checkout</button>
+        </form>
       </div>
       <% } %>
 

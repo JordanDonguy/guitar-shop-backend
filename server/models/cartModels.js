@@ -165,8 +165,8 @@ async function saveUserCart(cartId, userCart) {
     }
 };
 
-async function deleteAllFromCart(cartId) {
+async function clearCart(cartId) {
     await pool.query('DELETE FROM cart_items WHERE cart_id = $1', [cartId]);
 };
 
-module.exports = { createCart, getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId, saveUserCart, deleteAllFromCart };
+module.exports = { createCart, getCartByUserId, getItemsByCartId, addItemToCart, updateItemInCart, getPriceByItemId, saveUserCart, clearCart };
