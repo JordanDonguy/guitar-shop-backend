@@ -13,6 +13,7 @@ const userRoutes = require('./routes/user');
 const productsRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart');
 const checkoutRoutes = require('./routes/checkout');
+const ordersRoutes = require('./routes/orders');
 
 const initializePassport = require('./middlewares/passport-config');
 initializePassport(passport);
@@ -37,6 +38,8 @@ app.use('/products', productsRoutes);
 app.use('/cart' , cartRoutes);
 
 app.use('/checkout', checkoutRoutes);
+
+app.use('/orders', ordersRoutes);
 
 app.get('/', (req, res) => {
     res.render('../views/index.ejs', { isAuthenticated: req.isAuthenticated() })

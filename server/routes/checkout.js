@@ -37,7 +37,7 @@ router.post('/', checkAuthenticated, async (req, res) => {
   
       if (!total_price || !cart_id) {
         return res.redirect('/cart');
-      }
+      };
   
       // Check if card information is valid
       const isCardValid = isFakeCardValid(cardNumber, expiry, cvv);
@@ -47,22 +47,19 @@ router.post('/', checkAuthenticated, async (req, res) => {
           cart_id,
           error: "Card details are incorrect. Please check and try again."
         });
-      }
+      };
   
       // Get user_id and address_id
       const user_id = req.user.id;
       const address = await getAddressId(user_id);
       const address_id = address.id;
-      console.log(user_id);
-      console.log(address_id);
-      console.log(total_price);
   
       // Create a new order
       const newOrder = await addNewOrder(user_id, address_id, total_price);
   
       if (!newOrder) {
         return res.status(500).send("Failed to create order");
-      }
+      };
   
       // Add items to order
       const cart = await getItemsByCartId(cart_id);
@@ -83,7 +80,7 @@ router.post('/', checkAuthenticated, async (req, res) => {
       console.error('POST /checkout/', error);
       res.status(500).json({ error: 'Internal server error' });
     }
-  });
+});
   
 
 module.exports = router;

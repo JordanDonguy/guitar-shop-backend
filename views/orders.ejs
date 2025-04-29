@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Orders</title>
+  <link rel="stylesheet" href="/styles.css"> <!-- Replace with your actual stylesheet -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f6f7fb;
+      padding: 2rem;
+    }
+
+    .order-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .order-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toggle-btn {
+      font-size: 1.5em;
+      width: 120px;
+      text-align: center;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .toggle-btn:hover {
+      background-color: rgb(192, 192, 192);
+      border-radius: 5px;
+    }
+
+    .order-items {
+      margin-top: 1rem;
+    }
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .order-item img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-right: 1rem;
+    }
+
+    .item-details {
+      flex-grow: 1;
+    }
+
+    .item-details p {
+      margin: 2px 0;
+    }
+
+    .status {
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #4CAF50;
+    }
+
+    .product-link {
+        color: black;
+        text-decoration: none;
+    }
+
+    .product-link:hover {
+        text-decoration: underline
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Your Orders</h1>
+
+  <% if (orders && orders.length > 0) { %>
+    <% orders.forEach(order => { %>
+      <div class="order-card">
+        <div class="order-header">
+          <div class="order-info">
+            <p><strong>Order ID:</strong> <%= order.id %></p>
+            <p><strong>Date:</strong> <%= order.created_at %></p>
+            <p><strong>Total:</strong> $<%= order.total_price %></p>
+            <p><strong>Status:</strong> <span class="status"><%= order.status %></span></p>
+            <p><strong>Customer:</strong> <%= order.first_name %> <%= order.last_name %></p>
+            <button class="toggle-btn" onclick="toggleItems('<%= order.id %>')">
+                ▼ items
+            </button>
+          </div>
+        </div>
+
+        <div class="order-items" id="items-<%= order.id %>" style="display: none;">
+          <% order.items.forEach(item => { %>
+            <div class="order-item">
+              <img src="<%= item.image_url %>" alt="<%= item.product_name %>">
+              <div class="item-details">
+                <a href="/products/<%= item.id %>" class="product-link">
+                    <p><strong><%= item.brand_name %> - <%= item.name %></strong></p>
+                </a>
+                <p>Price: $<%= item.unit_price %></p>
+                <p>Quantity: <%= item.quantity %></p>
+                <p>Total: $<%= (item.unit_price * item.quantity).toFixed(2) %></p>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p>No orders found.</p>
+  <% } %>
+
+</body>
+<script>
+    function toggleItems(orderId) {
+      const section = document.getElementById(`items-${orderId}`);
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+    }
+</script>  
+</html>
