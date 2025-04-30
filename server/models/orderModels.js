@@ -53,7 +53,7 @@ async function getOrdersByUserId(user_id) {
         FROM orders
         JOIN users ON orders.user_id = users.id
         WHERE user_id = $1
-        `
+        `;
 
         const result = await pool.query(query, [user_id]);
         return result.rows;
@@ -78,7 +78,8 @@ async function getItemsByOrderId(order_id) {
         JOIN products ON order_items.product_id = products.id
         JOIN brands ON products.brand_id = brands.id
         WHERE order_items.order_id = $1
-        `
+        `;
+
         const result = await pool.query(query, [order_id]);
         return result.rows;
     } catch (error) {

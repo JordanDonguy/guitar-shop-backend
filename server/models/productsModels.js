@@ -1,5 +1,10 @@
 const pool = require('../db/index');
 
+function convertToEmbedUrl(url) {
+  if (!url) return '';
+  return url.replace('watch?v=', 'embed/');
+};
+
 async function getAllProducts() {
   try {
       let query = `
@@ -13,6 +18,7 @@ async function getAllProducts() {
       FROM products
       JOIN brands ON products.brand_id = brands.id
       `;
+
       const result = await pool.query(query);
       return result.rows
   } catch (error) {
@@ -69,7 +75,7 @@ async function getFilteredProducts({
       console.error('Error fetching filtered products:', error);
       throw error;
     }
-  };
+};
 
 async function getProductById(id) {
     try {
@@ -87,17 +93,13 @@ async function getProductById(id) {
         JOIN brands ON products.brand_id = brands.id
         WHERE products.id = $1
         `;
+
         const result = await pool.query(query, [id]);
         return result.rows;
     } catch(error) {
         console.error('Error fetching product by id:', error);
         throw error;
     }
-};
-
-function convertToEmbedUrl(url) {
-    if (!url) return '';
-    return url.replace('watch?v=', 'embed/');
 };
 
 module.exports = { getFilteredProducts, getProductById, convertToEmbedUrl, getAllProducts }

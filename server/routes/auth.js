@@ -96,8 +96,7 @@ router.post('/login', checkNotAuthenticated, (req, res, next) => {
         }
       });
     })(req, res, next); // <-- call passport.authenticate immediately
-  });
-  
+});
 
 // Logout route
 
@@ -106,6 +105,6 @@ router.post('/logout', function(req, res, next){
       if (err) { return next(err); }
       res.redirect('/auth/login');
     });
-  });
+});
 
 module.exports = router;

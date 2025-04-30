@@ -16,21 +16,7 @@ async function registerAddress({ user_id, street, city, state, postal_code, coun
     } catch (error) {
         throw error;
     }
-}
-
-// Find address by address ID
-async function findAddressById(id) {
-    const query = `SELECT * FROM address WHERE id = $1`;
-    const result = await pool.query(query, [id]);
-    return result.rows[0] || null;
-}
-
-// Find address by user ID
-async function findAddressByUserId(user_id) {
-    const query = `SELECT * FROM address WHERE user_id = $1`;
-    const result = await pool.query(query, [user_id]);
-    return result.rows[0] || null;
-}
+};
 
 // Find Address ID by user ID
 async function getAddressId(user_id) {
@@ -45,7 +31,5 @@ async function getAddressId(user_id) {
 
 module.exports = {
     registerAddress,
-    findAddressById,
-    findAddressByUserId,
     getAddressId
 };

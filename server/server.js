@@ -15,9 +15,11 @@ const cartRoutes = require('./routes/cart');
 const checkoutRoutes = require('./routes/checkout');
 const ordersRoutes = require('./routes/orders');
 
+// Initialize passport
 const initializePassport = require('./middlewares/passport-config');
 initializePassport(passport);
 
+// Express setup
 app.set('view-engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
 app.use(flash());
@@ -29,18 +31,15 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Routes setup
 app.use('/auth', authRoutes);
-
 app.use('/user', userRoutes);
-
 app.use('/products', productsRoutes);
-
 app.use('/cart' , cartRoutes);
-
 app.use('/checkout', checkoutRoutes);
-
 app.use('/orders', ordersRoutes);
 
+// Index view rendering
 app.get('/', (req, res) => {
     res.render('../views/index.ejs', { isAuthenticated: req.isAuthenticated() })
 })

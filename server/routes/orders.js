@@ -9,7 +9,7 @@ router.get('/', checkAuthenticated, async (req, res) => {
   
       // Fetch orders by user ID
       const orders = await getOrdersByUserId(user_id);
-        console.log(orders);
+
       // Attach items to each order
       if (orders && orders.length > 0) {
         await Promise.all(
@@ -17,9 +17,8 @@ router.get('/', checkAuthenticated, async (req, res) => {
             const items = await getItemsByOrderId(order.id);
             order.items = items; //
           })
-        );
-      }
-      console.log(orders);
+        )
+      };
       return res.render('orders.ejs', { orders: orders });
     } catch (error) {
       console.error('GET /orders/', error);

@@ -8,11 +8,14 @@ router.get('/', async (req, res) => {
         if (req.isAuthenticated()) {
             const cart = await getCartByUserId(req.user.id);
             const cartItems = await getItemsByCartId(cart.id);
+
             const finalPrice = cartItems.reduce((acc, item) => {
                 const price = parseFloat(item.total_price);  // Convert to number if it's a string
                 return acc + price;
             }, 0);
+
             res.render('cart.ejs', { products: cartItems, isAuthenticated: req.isAuthenticated(), final_price: finalPrice, cart_id: cart.id });
+
         } else {
             res.render('cart.ejs', { isAuthenticated: req.isAuthenticated() });
         };
@@ -26,7 +29,9 @@ router.post('/add/:id', async (req, res) => {
     try {
         const cart = await getCartByUserId(req.user.id);
         const cartItems = await getItemsByCartId(cart.id);
+
         const itemToUpdate = await cartItems.find(item => item.product_id == req.body.product_id);
+
         if (itemToUpdate) {
             const itemUpdated  = await updateItemInCart(itemToUpdate.id, 1);
             res.status(201).redirect('/cart');
@@ -44,6 +49,7 @@ router.post('/removeOne', (req, res) => {
     try {
         const { itemId } = req.body;
         updateItemInCart(itemId, -1);
+
         res.status(200).redirect('/cart')
     } catch (error) {
         console.error('POST /cart/removeOne', error);
@@ -55,6 +61,7 @@ router.post('/addOne', (req, res) => {
     try {
         const { itemId } = req.body;
         updateItemInCart(itemId, 1);
+
         res.status(200).redirect('/cart')
     } catch (error) {
         console.error('POST /cart/addOne', error);
@@ -66,6 +73,7 @@ router.post('/clearCart', async (req, res) => {
     try {
         const cartId = req.body['clear-cart'];
         await clearCart(cartId);
+        
         res.status(204).redirect('/cart')
     } catch (error) {
         console.error('POST /cart/delete', error);

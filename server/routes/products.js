@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
         console.error('GET /products/', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-})
+});
 
 router.get('/all', async (req, res) => {
   try {

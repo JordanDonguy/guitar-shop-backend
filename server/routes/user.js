@@ -10,7 +10,6 @@ router.get('/', checkAuthenticated, (req, res) => {
     res.redirect(`/user/${req.user.id}`)
 });
 
-
 router.get('/:id', checkAuthenticated, async (req, res) => {
     try {
         const requestedId = String(req.params.id);
@@ -41,7 +40,7 @@ router.post('/:id/update', checkAuthenticated, async (req, res) => {
 
         if (requestedId !== loggedInUserId) {
             return res.status(403).send('Unauthorized access');
-        }
+        };
 
         await updateUserAndAddress(requestedId, req.body);
         res.redirect(`/user/${requestedId}`);

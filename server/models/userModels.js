@@ -2,60 +2,74 @@ const pool = require('../db/index');
 const bcrypt = require('bcrypt');
 
 async function registerUser({ email, password, first_name, last_name, phone_number }) {
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const query = `
-    INSERT INTO users (email, password, first_name, last_name, phone_number)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING id, email, first_name, last_name, phone_number, created_at;
-  `;
-
-  const values = [email, hashedPassword, first_name, last_name, phone_number];
-
   try {
-    const result = await pool.query(query, values);
-    return result.rows[0];
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const query = `
+        INSERT INTO users (email, password, first_name, last_name, phone_number)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, email, first_name, last_name, phone_number, created_at
+      `;
+
+      const values = [email, hashedPassword, first_name, last_name, phone_number];
+
+      const result = await pool.query(query, values);
+      return result.rows[0];
   } catch (error) {
-    throw error;
+      console.error('Error registering user:', error);
+      throw error;
   }
-}
+};
 
 async function findUserByEmail(email) {
-  const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
-  if (!result.rows[0]) return null;
-  return result.rows[0];
-}
+  try {
+    const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+
+    if (!result.rows[0]) return null;
+    return result.rows[0];
+  } catch (error) {
+      console.error('Error finding user:', error);
+      throw error;
+  }
+};
 
 async function findUserById(id) {
-  const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
-  if (!result.rows[0]) return null;
-  return result.rows[0];
-}
+  try {
+    const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
+
+    if (!result.rows[0]) return null;
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error finding user:', error);
+    throw error;
+  }
+};
 
 async function getUserInfosById(id) {
-  const query = `
-    SELECT 
-      users.id,
-      users.email,
-      users.first_name,
-      users.last_name,
-      users.phone_number,
-      address.street,
-      address.city,
-      address.state,
-      address.postal_code,
-      address.country,
-      countries.name AS country_name
-    FROM users
-    LEFT JOIN address ON users.id = address.user_id
-    LEFT JOIN countries ON address.country = countries.code
-    WHERE users.id = $1;
-  `;
-
   try {
+    const query = `
+      SELECT 
+        users.id,
+        users.email,
+        users.first_name,
+        users.last_name,
+        users.phone_number,
+        address.street,
+        address.city,
+        address.state,
+        address.postal_code,
+        address.country,
+        countries.name AS country_name
+      FROM users
+      LEFT JOIN address ON users.id = address.user_id
+      LEFT JOIN countries ON address.country = countries.code
+      WHERE users.id = $1;
+    `;
+
     const result = await pool.query(query, [id]);
     return result.rows[0] || null;
   } catch (error) {
+    console.error('Error registering user:', error);
     throw error;
   }
 };

@@ -15,14 +15,21 @@ function isFakeCardValid(cardNumber, expiry, cvv) {
 };
 
 router.post('/initiate', (req, res) => {
-    const { cart_id, total_price } = req.body;
-    req.session.checkoutData = { cart_id, total_price };
-    res.redirect('/checkout');
-  });
+    try {
+      const { cart_id, total_price } = req.body;
+      req.session.checkoutData = { cart_id, total_price };
+
+      res.redirect('/checkout');
+    } catch (error) {
+      console.error('POST /checkout/initiate', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 router.get('/', checkAuthenticated, (req, res) => {
     try {
         const data = req.session.checkoutData;
+
         if (!data) return res.redirect('/cart');
         res.render('checkout.ejs', data);
     } catch (error) {
