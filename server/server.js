@@ -8,6 +8,7 @@ const bcrpyt = require('bcrypt');
 const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
+const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const productsRoutes = require('./routes/products');
@@ -30,6 +31,9 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors({
+  origin: 'http://localhost:5173',
+}));
 
 // Routes setup
 app.use('/auth', authRoutes);
