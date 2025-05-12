@@ -94,6 +94,7 @@ async function getProductById(id) {
           products.description,
           products.price,
           products.stock,
+          products.image_url,
           products.image_url2,
           products.video_url
         FROM products

@@ -6,8 +6,16 @@ const { getAllCountries } = require('../models/countryModels');
 
 // Get user informations
 
-router.get('/', checkAuthenticated, (req, res) => {
-    res.redirect(`/user/${req.user.id}`)
+router.get('/', checkAuthenticated, async (req, res) => {
+    try {
+        const user = await getUserInfosById(req.user.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        const countries = await getAllCountries();
+
+        res.json({ user, countries, error: null });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error' });
+    }
 });
 
 router.get('/:id', checkAuthenticated, async (req, res) => {
@@ -33,23 +41,20 @@ router.get('/:id', checkAuthenticated, async (req, res) => {
     }
 });
 
-router.post('/:id/update', checkAuthenticated, async (req, res) => {
+router.patch('/:id', checkAuthenticated, async (req, res) => {
     try {
         const requestedId = String(req.params.id);
         const loggedInUserId = String(req.user.id);
 
         if (requestedId !== loggedInUserId) {
-            return res.status(403).send('Unauthorized access');
-        };
+            return res.status(403).json({ error: 'Unauthorized access' });
+        }
 
         await updateUserAndAddress(requestedId, req.body);
-        res.redirect(`/user/${requestedId}`);
+        res.status(200).json({ message: 'Profile updated successfully' });
     } catch (err) {
         console.error(err);
-        res.status(500).render('user-profile.ejs', {
-            user: req.body, // reuse input if there's an error
-            error: 'Something went wrong while updating your profile.'
-        });
+        res.status(500).json({ error: 'Something went wrong while updating your profile.' });
     }
 });
 

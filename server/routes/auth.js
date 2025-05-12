@@ -13,7 +13,7 @@ const { getCartByUserId, getItemsByCartId, saveUserCart, createCart } = require(
 router.get('/register', checkNotAuthenticated, async (req, res) => {
     try {
         const countries = await getAllCountries();
-        res.render('register.ejs', { countries });
+        res.json({ countries });
       } catch (err) {
         console.error(err);
         res.status(500).send('Error loading registration form');
@@ -54,48 +54,41 @@ router.get('/login', checkNotAuthenticated, (req, res) => {
 });
 
 router.post('/login', checkNotAuthenticated, (req, res, next) => {
-    passport.authenticate('local', async (err, user, info) => {
-      if (err) {
-        return next(err);
-      }
-      if (!user) {
-        return res.redirect('/auth/login'); // If login failed
-      }
-  
-      req.logIn(user, async (err) => {
-        if (err) {
-          return next(err);
-        }
-  
-        try {
-          // Now user is logged in successfully
-          const temporaryCart = JSON.parse(req.body.temporaryCart); // cart sent from the client
-          const cart = await getCartByUserId(user.id);
-          const cartItems = await getItemsByCartId(cart.id);
+  passport.authenticate('local', async (err, user, info) => {
+    if (err) return next(err);
 
-          temporaryCart.forEach(item => {
-            // Check if the item already exists in the user's cart
-            const existingItem = cartItems.find(cartItem => cartItem.product_id == item.product_id);
-  
-            if (existingItem) {
-              existingItem.quantity += item.quantity;
-            } else {
-              cartItems.push({
-                product_id: item.product_id,
-                quantity: item.quantity
-              });
-            }
-          });
-          // Save the updated cart back to the database
-          await saveUserCart(cart.id, cartItems);
+    if (!user) {
+      return res.status(401).json({ error: info.message || 'Invalid credentials' });
+    }
 
-          return res.redirect('/'); // success redirect after merge
-        } catch (error) {
-          console.error(error);
-          return res.status(500).send('An error occurred while merging the cart.');
-        }
-      });
-    })(req, res, next); // <-- call passport.authenticate immediately
+    req.logIn(user, async (err) => {
+      if (err) return next(err);
+
+      try {
+        // Merge the temporary cart
+        const temporaryCart = JSON.parse(req.body.temporaryCart || '[]');
+        const cart = await getCartByUserId(user.id);
+        const cartItems = await getItemsByCartId(cart.id);
+
+        temporaryCart.forEach(item => {
+          const existingItem = cartItems.find(ci => ci.product_id == item.product_id);
+          if (existingItem) {
+            existingItem.quantity += item.quantity;
+          } else {
+            cartItems.push({ product_id: item.product_id, quantity: item.quantity });
+          }
+        });
+
+        await saveUserCart(cart.id, cartItems);
+
+        // ✅ Send JSON instead of redirect
+        return res.json({ success: true, user: { id: user.id, email: user.email } });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Cart merge failed' });
+      }
+    });
+  })(req, res, next);
 });
 
 // Logout route

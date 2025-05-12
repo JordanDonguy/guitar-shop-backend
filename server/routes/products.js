@@ -53,11 +53,10 @@ router.get('/:id', async (req, res) => {
 
         const productData = {
             ...product,
-            description_html: marked.parse(product.description || ''),
             video_url: convertToEmbedUrl(rawVideoUrl)
         }; 
 
-        res.render('product.ejs', { product: productData, isAuthenticated: req.isAuthenticated() });
+        res.status(200).json({ product: productData, isAuthenticated: req.isAuthenticated() });
 
     } catch (error) {
         console.error('GET /products/:id:', error);

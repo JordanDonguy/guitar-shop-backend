@@ -1,4 +1,4 @@
-if(process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 };
 
@@ -22,24 +22,31 @@ initializePassport(passport);
 
 // Express setup
 app.set('view-engine', 'ejs');
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(flash());
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // use true in production with HTTPS
+        httpOnly: true,
+        sameSite: 'lax',
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors({
-  origin: 'http://localhost:5173',
+    origin: 'http://localhost:5173',
+    credentials: true
 }));
 
 // Routes setup
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/products', productsRoutes);
-app.use('/cart' , cartRoutes);
+app.use('/cart', cartRoutes);
 app.use('/checkout', checkoutRoutes);
 app.use('/orders', ordersRoutes);
 

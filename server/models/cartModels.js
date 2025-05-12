@@ -37,6 +37,7 @@ async function getItemsByCartId(cart_id) {
         let query = `
         SELECT 
         cart_items.id,
+        cart_items.cart_id,
         product_id,
         quantity, 
         products.price,
@@ -74,7 +75,7 @@ async function getPriceByItemId(item_id) {
     }
 }
 
-async function addItemToCart(cart_id, product_id, quantity) {
+async function addItemToCart(product_id, cart_id, quantity) {
     try {
         let query = `
         INSERT INTO cart_items (cart_id, product_id, quantity)
@@ -91,32 +92,35 @@ async function addItemToCart(cart_id, product_id, quantity) {
     }
 };
 
-async function updateItemInCart(id, quantity) {
+async function updateItemInCart(product_id, cart_id, quantity) {
     try {
         // Query to get the current quantity of the item
         const quantityQuery = `
             SELECT quantity
             FROM cart_items
-            WHERE id = $1
+            WHERE product_id = $1
+            AND cart_id = $2
         `;
         
         // Query to update the quantity of the item in the cart
         const updateQuery = `
             UPDATE cart_items
-            SET quantity = quantity + $2
-            WHERE id = $1
+            SET quantity = quantity + $3
+            WHERE product_id = $1
+            AND cart_id = $2
             RETURNING *
         `;
         
         // Query to remove the item from the cart if quantity is 0
         const removeQuery = `
             DELETE FROM cart_items
-            WHERE id = $1 
+            WHERE product_id = $1
+            AND cart_id = $2
             RETURNING *
         `;
         
         // Get the current quantity of the item
-        const itemQuantityResult = await pool.query(quantityQuery, [id]);
+        const itemQuantityResult = await pool.query(quantityQuery, [product_id, cart_id]);
         if (itemQuantityResult.rows.length === 0) {
             throw new Error('Item not found in the cart');
         }
@@ -125,7 +129,7 @@ async function updateItemInCart(id, quantity) {
 
         // If the new quantity is positive, update the item quantity
         if (quantity > 0) {
-            const values = [id, quantity];
+            const values = [product_id, cart_id, quantity];
             const result = await pool.query(updateQuery, values);
             return result.rows[0];
         }
@@ -134,12 +138,12 @@ async function updateItemInCart(id, quantity) {
         if (quantity < 0) {
             if (currentQuantity + quantity > 0) {
                 // If the item quantity is still positive after decrement, update it
-                const values = [id, quantity];
+                const values = [product_id, cart_id, quantity];
                 const result = await pool.query(updateQuery, values);
                 return result.rows[0];
             } else if (currentQuantity + quantity <= 0) {
                 // If the quantity goes to 0 or below, delete the item
-                const result = await pool.query(removeQuery, [id]);
+                const result = await pool.query(removeQuery, [product_id, cart_id]);
                 return result.rows[0];
             }
         }

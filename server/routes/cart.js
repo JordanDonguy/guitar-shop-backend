@@ -5,8 +5,7 @@ const { checkAuthenticated, checkNotAuthenticated } = require('../middlewares/ch
 
 router.get('/', async (req, res) => {
     try {
-        if (req.isAuthenticated()) {
-            const cart = await getCartByUserId(req.user.id);
+            const cart = await getCartByUserId(req.query.userId);
             const cartItems = await getItemsByCartId(cart.id);
 
             const finalPrice = cartItems.reduce((acc, item) => {
@@ -14,30 +13,27 @@ router.get('/', async (req, res) => {
                 return acc + price;
             }, 0);
 
-            res.render('cart.ejs', { products: cartItems, isAuthenticated: req.isAuthenticated(), final_price: finalPrice, cart_id: cart.id });
-
-        } else {
-            res.render('cart.ejs', { isAuthenticated: req.isAuthenticated() });
-        };
+            res.status(200).json({ products: cartItems, final_price: finalPrice, cart_id: cart.id });
     } catch (error) {
         console.error('GET /cart/', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-router.post('/add/:id', async (req, res) => {
+router.post('/add', async (req, res) => {
     try {
-        const cart = await getCartByUserId(req.user.id);
+        const { user, product_id } = req.body;
+        const cart = await getCartByUserId(user.id);
         const cartItems = await getItemsByCartId(cart.id);
 
-        const itemToUpdate = await cartItems.find(item => item.product_id == req.body.product_id);
+        const itemToUpdate = cartItems.find(item => item.product_id == product_id && item.cart_id == cart.id);
 
         if (itemToUpdate) {
-            const itemUpdated  = await updateItemInCart(itemToUpdate.id, 1);
-            res.status(201).redirect('/cart');
+            const itemUpdated = await updateItemInCart(product_id, cart.id, 1);
+            res.status(201).json({ success: true })
         } else {
-            const newItem = await addItemToCart(cart.id, req.body.product_id, 1);
-            res.status(201).redirect('/cart');
+            const newItem = await addItemToCart(product_id, cart.id, 1);
+            res.status(201).json({ success: true })
         }
     } catch (error) {
         console.error('POST /cart/add/:id', error);
@@ -45,38 +41,15 @@ router.post('/add/:id', async (req, res) => {
     }
 });
 
-router.post('/removeOne', (req, res) => {
+router.post('/updateQuantity', (req, res) => {
     try {
-        const { itemId } = req.body;
-        updateItemInCart(itemId, -1);
+        const { product_id, cart_id, quantity } = req.body;
+        console.log(quantity)
+        updateItemInCart(product_id, cart_id, quantity);
 
-        res.status(200).redirect('/cart')
+        res.status(200).json({ success: true })
     } catch (error) {
         console.error('POST /cart/removeOne', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-router.post('/addOne', (req, res) => {
-    try {
-        const { itemId } = req.body;
-        updateItemInCart(itemId, 1);
-
-        res.status(200).redirect('/cart')
-    } catch (error) {
-        console.error('POST /cart/addOne', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-router.post('/clearCart', async (req, res) => {
-    try {
-        const cartId = req.body['clear-cart'];
-        await clearCart(cartId);
-        
-        res.status(204).redirect('/cart')
-    } catch (error) {
-        console.error('POST /cart/delete', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
