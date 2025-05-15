@@ -21,6 +21,7 @@ async function registerAddress({
     const result = await pool.query(query, values);
     return result.rows[0];
   } catch (error) {
+    console.error("Error registering address:", error);
     throw error;
   }
 }

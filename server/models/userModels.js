@@ -77,7 +77,7 @@ async function getUserInfosById(id) {
     const result = await pool.query(query, [id]);
     return result.rows[0] || null;
   } catch (error) {
-    console.error("Error registering user:", error);
+    console.error("Error getting user info by ID:", error);
     throw error;
   }
 }
@@ -131,6 +131,7 @@ async function updateUserAndAddress(id, data) {
     }
 
     await client.query("COMMIT");
+    return await getUserInfosById(id);
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;

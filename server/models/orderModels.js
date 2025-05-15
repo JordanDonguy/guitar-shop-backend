@@ -24,7 +24,8 @@ async function addItemToOrder(order_id, product_id, quantity, unit_price) {
         INSERT INTO order_items (order_id, product_id, quantity, unit_price)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (order_id, product_id) DO UPDATE
-        SET quantity = order_items.quantity + EXCLUDED.quantity;
+        SET quantity = order_items.quantity + EXCLUDED.quantity
+        RETURNING *;
         `;
 
     const values = [order_id, product_id, quantity, unit_price];

@@ -4,7 +4,12 @@ const { findUserByEmail, findUserById } = require("../models/userModels");
 
 function initialize(passport) {
   const authenticateUser = async (email, password, done) => {
-    const user = await findUserByEmail(email);
+    let user;
+    try {
+      user = await findUserByEmail(email);
+    } catch (err) {
+      return done(err);
+    }
 
     if (user == null) {
       return done(null, false, { message: "No user found with that email" });
@@ -33,8 +38,12 @@ function initialize(passport) {
   });
 
   passport.deserializeUser(async (id, done) => {
-    const user = await findUserById(id);
-    return done(null, user);
+    try {
+      const user = await findUserById(id);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
   });
 }
 

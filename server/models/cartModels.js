@@ -67,7 +67,7 @@ async function getPriceByItemId(item_id) {
         FROM products
         WHERE id = $1
         `;
-    const result = pool.query(query, [item_id]);
+    const result = await pool.query(query, [item_id]);
     return result.rows[0] || null;
   } catch (error) {
     console.error("error fetching product price : ", error);
