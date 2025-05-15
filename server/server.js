@@ -31,7 +31,7 @@ app.use(flash());
 app.use(cors({
   origin: process.env.CLIENT_ORIGIN,
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"]
 }));
 
