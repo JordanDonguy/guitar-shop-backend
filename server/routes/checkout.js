@@ -25,74 +25,43 @@ function isFakeCardValid(cardNumber, expiry, cvv) {
   }
 }
 
-router.post("/initiate", (req, res) => {
-  try {
-    const { cart_id, total_price } = req.body;
-    req.session.checkoutData = { cart_id, total_price };
-
-    res.redirect("/checkout");
-  } catch (error) {
-    console.error("POST /checkout/initiate", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-router.get("/", checkAuthenticated, (req, res) => {
-  try {
-    const data = req.session.checkoutData;
-
-    if (!data) return res.redirect("/cart");
-    res.render("checkout.ejs", data);
-  } catch (error) {
-    console.error("GET /checkout/", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 router.post("/", checkAuthenticated, async (req, res) => {
   try {
-    const { cardNumber, expiry, cvv, total_price, user } = req.body;
-    const userCart = await getCartByUserId(user.id);
-    const cart_id = userCart.id;
+    const { cardNumber, expiry, cvv } = req.body;
 
-    if (!total_price || !cart_id) {
-      return res.redirect("/cart");
-    }
-
-    // Check if card information is valid
-    const isCardValid = isFakeCardValid(cardNumber, expiry, cvv);
-    if (!isCardValid) {
-      return res.status(400).render("checkout.ejs", {
-        total_price,
-        cart_id,
+    if (!isFakeCardValid(cardNumber, expiry, cvv)) {
+      return res.status(400).json({
         error: "Card details are incorrect. Please check and try again.",
       });
     }
 
-    // Get user_id and address_id
-    const address = await getAddressId(user.id);
-    const address_id = address.id;
+    const userId = req.user.id;
+    const cart = await getCartByUserId(userId);
+    const cartItems = await getItemsByCartId(cart.id);
 
-    // Create a new order
-    const newOrder = await addNewOrder(user.id, address_id, total_price);
-
-    if (!newOrder) {
-      return res.status(500).send("Failed to create order");
+    if (!cartItems || cartItems.length === 0) {
+      return res.status(400).json({ error: "Your cart is empty." });
     }
 
-    // Add items to order
-    const cart = await getItemsByCartId(cart_id);
+    const total_price = cartItems.reduce(
+      (sum, item) => sum + parseFloat(item.total_price),
+      0,
+    );
+
+    const address = await getAddressId(userId);
+    if (!address) return res.status(400).json({ error: "No address on file." });
+
+    const order = await addNewOrder(userId, address.id, total_price);
+    if (!order) return res.status(500).json({ error: "Failed to create order" });
 
     await Promise.all(
-      cart.map((item) =>
-        addItemToOrder(newOrder.id, item.product_id, item.quantity, item.price),
+      cartItems.map((item) =>
+        addItemToOrder(order.id, item.product_id, item.quantity, item.price),
       ),
     );
 
-    // Clear cart after successful order
-    await clearCart(cart_id);
+    await clearCart(cart.id);
 
-    // Redirect to confirmation or cart
     return res.status(201).json({ success: true });
   } catch (error) {
     console.error("POST /checkout/", error);
