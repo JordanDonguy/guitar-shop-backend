@@ -24,7 +24,6 @@ const initializePassport = require("./middlewares/passport-config");
 initializePassport(passport);
 
 // Express setup
-app.set("view-engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(flash());
@@ -89,9 +88,5 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something broke!" });
 });
 
-// Index view rendering
-app.get("/", (req, res) => {
-  res.render("../views/index.ejs", { isAuthenticated: req.isAuthenticated() });
-});
 
 app.listen(3000);
