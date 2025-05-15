@@ -13,13 +13,18 @@ const {
   checkNotAuthenticated,
 } = require("../middlewares/checkAuth");
 
-router.get("/", async (req, res) => {
+router.get("/", checkAuthenticated, async (req, res) => {
   try {
+    const userId = req.query.userId;
+    if (!userId || userId != req.user.id) {
+      return res.status(403).json({ error: "Forbidden" });
+    };
+
     const cart = await getCartByUserId(req.query.userId);
     const cartItems = await getItemsByCartId(cart.id);
 
     const finalPrice = cartItems.reduce((acc, item) => {
-      const price = parseFloat(item.total_price); // Convert to number if it's a string
+      const price = parseFloat(item.total_price);
       return acc + price;
     }, 0);
 
@@ -32,33 +37,37 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/add", async (req, res) => {
+router.post("/add", checkAuthenticated, async (req, res) => {
   try {
-    const { user, product_id } = req.body;
-    const cart = await getCartByUserId(user.id);
-    const cartItems = await getItemsByCartId(cart.id);
+    const { product_id } = req.body;
+    if (!product_id) return res.status(400).json({ error: "Missing product_id" });
 
-    const itemToUpdate = cartItems.find(
-      (item) => item.product_id == product_id && item.cart_id == cart.id,
-    );
+    const cart = await getCartByUserId(req.user.id);
+    if (!cart) return res.status(404).json({ error: "Cart not found" });
+
+    const cartItems = await getItemsByCartId(cart.id);
+    const itemToUpdate = cartItems.find(item => item.product_id == product_id);
 
     if (itemToUpdate) {
-      const itemUpdated = await updateItemInCart(product_id, cart.id, 1);
-      res.status(201).json({ success: true });
+      await updateItemInCart(product_id, cart.id, 1);
     } else {
-      const newItem = await addItemToCart(product_id, cart.id, 1);
-      res.status(201).json({ success: true });
+      await addItemToCart(product_id, cart.id, 1);
     }
+
+    res.status(201).json({ success: true });
   } catch (error) {
-    console.error("POST /cart/add/:id", error);
+    console.error("POST /cart/add", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-router.post("/updateQuantity", (req, res) => {
+router.post("/updateQuantity", checkAuthenticated, async (req, res) => {
   try {
-    const { product_id, cart_id, quantity } = req.body;
-    updateItemInCart(product_id, cart_id, quantity);
+    const { product_id, quantity } = req.body;
+    const cart = await getCartByUserId(req.user.id);
+
+    if (!cart) return res.status(404).json({ error: "Cart not found" });
+    await updateItemInCart(product_id, cart.id, quantity);
 
     res.status(200).json({ success: true });
   } catch (error) {
