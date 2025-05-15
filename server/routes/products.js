@@ -29,6 +29,8 @@ router.get("/", async (req, res) => {
     const inStockOnly = req.query.inStock === "true";
     const sortOrder = req.query.sort === "asc" ? "ASC" : "DESC";
 
+    const search = req.query.search?.toLowerCase() || "";
+
     const products = await getFilteredProducts({
       categoryIds,
       brandIds,
@@ -38,19 +40,11 @@ router.get("/", async (req, res) => {
       sortOrder,
     });
 
-    const search = req.query.search?.toLowerCase() || "";
-
-    const searchedProducts = products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(search) ||
-        p.brand.toLowerCase().includes(search),
-    );
-
     const categories = await getAllCategories();
     const brands = await getAllBrands();
 
     /* res.render('products.ejs', { products, isAuthenticated: req.isAuthenticated() }); */
-    res.status(200).json({ products: searchedProducts, categories, brands });
+    res.status(200).json({ products, categories, brands });
   } catch (error) {
     console.error("GET /products/category/:id error:", error);
     res.status(500).json({ error: "Internal server error" });
