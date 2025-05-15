@@ -1,12 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
 const passport = require("passport");
-const { registerUser, findUserByEmail } = require("../models/userModels");
+
 const {
-  checkAuthenticatd,
+  checkAuthenticated,
   checkNotAuthenticated,
 } = require("../middlewares/checkAuth");
+const validateRegister = require("../middlewares/validateRegister");
+const validateLogin = require("../middlewares/validateLogin");
+const handleValidation = require("../middlewares/handleValidation");
+
+const { registerUser, findUserByEmail } = require("../models/userModels");
 const { registerAddress } = require("../models/addressModels");
 const { getAllCountries } = require("../models/countryModels");
 const {
@@ -28,43 +32,62 @@ router.get("/register", checkNotAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/register", checkNotAuthenticated, async (req, res) => {
-  try {
-    const existingUser = await findUserByEmail(req.body.email);
-    if (existingUser)
-      return res
-        .status(400)
-        .render("register.ejs", { error: "Email already registered" });
+router.post(
+  "/register",
+  checkNotAuthenticated,
+  validateRegister,
+  handleValidation,
+  async (req, res) => {
+    try {
+      const {
+        email,
+        password,
+        first_name,
+        last_name,
+        phone_number,
+        street,
+        city,
+        state,
+        postal_code,
+        country,
+      } = req.body;
 
-    const newUser = await registerUser(req.body);
+      const existingUser = await findUserByEmail(email);
+      if (existingUser)
+        return res.status(400).json({ error: "Email already registered" });
 
-    const addressData = {
-      user_id: newUser.id,
-      street: req.body.street,
-      city: req.body.city,
-      state: req.body.state,
-      postal_code: req.body.postal_code,
-      country: req.body.country,
-    };
+      const newUser = await registerUser({email, password, first_name, last_name, phone_number});
 
-    const newAddress = await registerAddress(addressData);
+      const addressData = {
+        user_id: newUser.id,
+        street,
+        city,
+        state,
+        postal_code,
+        country,
+      };
 
-    const newCart = await createCart(newUser.id);
+      const newAddress = await registerAddress(addressData);
+      const newCart = await createCart(newUser.id);
 
-    res.redirect("/auth/login");
-  } catch (err) {
-    console.error(err);
-    res.status(500).render("register.ejs", { error: "Internal server error" });
+      return res.json({
+        success: true,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
-});
-
+);
+ 
 // Login route
 
-router.get("/login", checkNotAuthenticated, (req, res) => {
-  res.render("login.ejs");
-});
-
-router.post("/login", checkNotAuthenticated, (req, res, next) => {
+router.post(
+  "/login",
+  checkNotAuthenticated,
+  validateLogin,
+  handleValidation,
+  (req, res, next) => {
   passport.authenticate("local", async (err, user, info) => {
     if (err) return next(err);
 
@@ -99,7 +122,6 @@ router.post("/login", checkNotAuthenticated, (req, res, next) => {
 
         await saveUserCart(cart.id, cartItems);
 
-        // ✅ Send JSON instead of redirect
         return res.json({
           success: true,
           user: { id: user.id, email: user.email },
@@ -114,12 +136,12 @@ router.post("/login", checkNotAuthenticated, (req, res, next) => {
 
 // Logout route
 
-router.post("/logout", function (req, res, next) {
+router.post("/logout", checkAuthenticated, function (req, res, next) {
   req.logout(function (err) {
     if (err) {
       return next(err);
     }
-    res.redirect("/auth/login");
+    res.json({ success: true });
   });
 });
 
