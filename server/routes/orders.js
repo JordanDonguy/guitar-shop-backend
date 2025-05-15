@@ -11,21 +11,20 @@ const {
 
 router.get("/", checkAuthenticated, async (req, res) => {
   try {
-    const user_id = req.query.userId;
+    const userId = req.user.id;
 
-    const orders = await getOrdersByUserId(user_id);
+    const orders = await getOrdersByUserId(userId);
 
-    // Attach items to each order
     if (orders && orders.length > 0) {
       await Promise.all(
         orders.map(async (order) => {
           const items = await getItemsByOrderId(order.id);
-          order.items = items; //
-        }),
+          order.items = items;
+        })
       );
     }
-    console.log(orders);
-    return res.status(200).json({ orders: orders });
+
+    return res.status(200).json({ orders });
   } catch (error) {
     console.error("GET /orders/", error);
     res.status(500).json({ error: "Internal server error" });
