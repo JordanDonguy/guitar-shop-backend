@@ -1,37 +1,45 @@
-const pool = require('../db/index');
-const bcrypt = require('bcrypt');
+const pool = require("../db/index");
+const bcrypt = require("bcrypt");
 
-async function registerUser({ email, password, first_name, last_name, phone_number }) {
+async function registerUser({
+  email,
+  password,
+  first_name,
+  last_name,
+  phone_number,
+}) {
   try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      const query = `
+    const query = `
         INSERT INTO users (email, password, first_name, last_name, phone_number)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id, email, first_name, last_name, phone_number, created_at
       `;
 
-      const values = [email, hashedPassword, first_name, last_name, phone_number];
+    const values = [email, hashedPassword, first_name, last_name, phone_number];
 
-      const result = await pool.query(query, values);
-      return result.rows[0];
+    const result = await pool.query(query, values);
+    return result.rows[0];
   } catch (error) {
-      console.error('Error registering user:', error);
-      throw error;
+    console.error("Error registering user:", error);
+    throw error;
   }
-};
+}
 
 async function findUserByEmail(email) {
   try {
-    const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+    const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [
+      email,
+    ]);
 
     if (!result.rows[0]) return null;
     return result.rows[0];
   } catch (error) {
-      console.error('Error finding user:', error);
-      throw error;
+    console.error("Error finding user:", error);
+    throw error;
   }
-};
+}
 
 async function findUserById(id) {
   try {
@@ -40,10 +48,10 @@ async function findUserById(id) {
     if (!result.rows[0]) return null;
     return result.rows[0];
   } catch (error) {
-    console.error('Error finding user:', error);
+    console.error("Error finding user:", error);
     throw error;
   }
-};
+}
 
 async function getUserInfosById(id) {
   try {
@@ -69,19 +77,19 @@ async function getUserInfosById(id) {
     const result = await pool.query(query, [id]);
     return result.rows[0] || null;
   } catch (error) {
-    console.error('Error registering user:', error);
+    console.error("Error registering user:", error);
     throw error;
   }
-};
+}
 
 async function updateUserAndAddress(id, data) {
   const client = await pool.connect();
 
   try {
-    await client.query('BEGIN');
+    await client.query("BEGIN");
 
-    const userFields = ['first_name', 'last_name', 'email', 'phone_number'];
-    const addressFields = ['street', 'city', 'state', 'postal_code', 'country'];
+    const userFields = ["first_name", "last_name", "email", "phone_number"];
+    const addressFields = ["street", "city", "state", "postal_code", "country"];
 
     let userUpdates = [];
     let userValues = [];
@@ -98,10 +106,10 @@ async function updateUserAndAddress(id, data) {
 
     if (userUpdates.length > 0) {
       userValues.push(id); // WHERE id = $n
-      userUpdates = userUpdates.join(', ');
+      userUpdates = userUpdates.join(", ");
       await client.query(
         `UPDATE users SET ${userUpdates} WHERE id = $${userValues.length}`,
-        userValues
+        userValues,
       );
     }
 
@@ -115,26 +123,26 @@ async function updateUserAndAddress(id, data) {
 
     if (addressUpdates.length > 0) {
       addressValues.push(id); // WHERE user_id = $n
-      addressUpdates = addressUpdates.join(', ');
+      addressUpdates = addressUpdates.join(", ");
       await client.query(
         `UPDATE address SET ${addressUpdates} WHERE user_id = $${addressValues.length}`,
-        addressValues
+        addressValues,
       );
     }
 
-    await client.query('COMMIT');
+    await client.query("COMMIT");
   } catch (error) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     throw error;
   } finally {
     client.release();
   }
-};
+}
 
 module.exports = {
   registerUser,
   findUserByEmail,
   findUserById,
   getUserInfosById,
-  updateUserAndAddress
+  updateUserAndAddress,
 };

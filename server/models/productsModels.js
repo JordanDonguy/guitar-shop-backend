@@ -1,9 +1,9 @@
-const pool = require('../db/index');
+const pool = require("../db/index");
 
 function convertToEmbedUrl(url) {
-  if (!url) return '';
-  return url.replace('watch?v=', 'embed/');
-};
+  if (!url) return "";
+  return url.replace("watch?v=", "embed/");
+}
 
 async function getAllProducts() {
   try {
@@ -20,12 +20,12 @@ async function getAllProducts() {
       `;
 
     const result = await pool.query(query);
-    return result.rows
+    return result.rows;
   } catch (error) {
-    console.error('Error fetching all products:', error);
+    console.error("Error fetching all products:", error);
     throw error;
   }
-};
+}
 
 async function getFilteredProducts({
   categoryIds,
@@ -33,7 +33,7 @@ async function getFilteredProducts({
   minPrice = 0,
   maxPrice = Number.MAX_SAFE_INTEGER,
   inStockOnly = false,
-  sortOrder = 'ASC',
+  sortOrder = "ASC",
 }) {
   try {
     let query = `
@@ -54,15 +54,14 @@ async function getFilteredProducts({
 
     // Optional category filter (multiple category IDs)
     if (categoryIds && categoryIds.length > 0) {
-      const placeholders = categoryIds.map(() => `$${++paramIndex}`).join(', ');
+      const placeholders = categoryIds.map(() => `$${++paramIndex}`).join(", ");
       query += ` AND products.category_id IN (${placeholders})`;
       params.push(...categoryIds);
     }
 
-
     // Optional brand filter
     if (brandIds && brandIds.length > 0) {
-      const placeholders = brandIds.map(() => `$${++paramIndex}`).join(', ');
+      const placeholders = brandIds.map(() => `$${++paramIndex}`).join(", ");
       query += ` AND products.brand_id IN (${placeholders})`;
       params.push(...brandIds);
     }
@@ -73,16 +72,15 @@ async function getFilteredProducts({
     }
 
     // Sorting
-    query += ` ORDER BY products.price ${sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'}`;
+    query += ` ORDER BY products.price ${sortOrder.toUpperCase() === "ASC" ? "ASC" : "DESC"}`;
 
     const { rows } = await pool.query(query, params);
     return rows;
-
   } catch (error) {
-    console.error('Error fetching filtered products:', error);
+    console.error("Error fetching filtered products:", error);
     throw error;
   }
-};
+}
 
 async function getProductById(id) {
   try {
@@ -105,9 +103,9 @@ async function getProductById(id) {
     const result = await pool.query(query, [id]);
     return result.rows;
   } catch (error) {
-    console.error('Error fetching product by id:', error);
+    console.error("Error fetching product by id:", error);
     throw error;
   }
-};
+}
 
-module.exports = { getFilteredProducts, getProductById, convertToEmbedUrl }
+module.exports = { getFilteredProducts, getProductById, convertToEmbedUrl };
