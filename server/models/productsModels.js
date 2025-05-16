@@ -5,28 +5,6 @@ function convertToEmbedUrl(url) {
   return url.replace("watch?v=", "embed/");
 }
 
-async function getAllProducts() {
-  try {
-    let query = `
-      SELECT
-        brands.name AS brand,
-        products.id,
-        products.name,
-        products.price,
-        products.stock,
-        products.image_url
-      FROM products
-      JOIN brands ON products.brand_id = brands.id
-      `;
-
-    const result = await pool.query(query);
-    return result.rows;
-  } catch (error) {
-    console.error("Error fetching all products:", error);
-    throw error;
-  }
-}
-
 async function getFilteredProducts({
   categoryIds,
   brandIds,

@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const marked = require("marked");
 const {
   getFilteredProducts,
   getProductById,
@@ -28,8 +27,6 @@ router.get("/", async (req, res) => {
       : Number.MAX_SAFE_INTEGER;
     const inStockOnly = req.query.inStock === "true";
     const sortOrder = req.query.sort === "asc" ? "ASC" : "DESC";
-
-    const search = req.query.search?.toLowerCase() || "";
 
     const products = await getFilteredProducts({
       categoryIds,

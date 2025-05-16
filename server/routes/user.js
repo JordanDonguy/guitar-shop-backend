@@ -1,11 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const { checkAuthenticated } = require("../middlewares/checkAuth");
 const {
-  checkAuthenticated,
-  checkNotAuthenticated,
-} = require("../middlewares/checkAuth");
-const {
-  findUserById,
   getUserInfosById,
   updateUserAndAddress,
 } = require("../models/userModels");
@@ -20,8 +16,8 @@ router.get("/", checkAuthenticated, async (req, res) => {
     const countries = await getAllCountries();
 
     res.json({ user, countries, error: null });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
+  } catch (error) {
+    res.status(500).json(error);
   }
 });
 

@@ -1,9 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {
-  checkAuthenticated,
-  checkNotAuthenticated,
-} = require("../middlewares/checkAuth");
+const { checkAuthenticated } = require("../middlewares/checkAuth");
 const {
   getOrdersByUserId,
   getItemsByOrderId,

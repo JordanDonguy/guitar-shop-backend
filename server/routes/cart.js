@@ -4,14 +4,9 @@ const {
   getCartByUserId,
   getItemsByCartId,
   addItemToCart,
-  updateItemInCart,
-  getPriceByItemId,
-  clearCart,
+  updateItemInCart
 } = require("../models/cartModels");
-const {
-  checkAuthenticated,
-  checkNotAuthenticated,
-} = require("../middlewares/checkAuth");
+const { checkAuthenticated } = require("../middlewares/checkAuth");
 
 router.get("/", checkAuthenticated, async (req, res) => {
   try {

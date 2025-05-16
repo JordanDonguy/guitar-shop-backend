@@ -67,8 +67,8 @@ router.post(
         country,
       };
 
-      const newAddress = await registerAddress(addressData);
-      const newCart = await createCart(newUser.id);
+      await registerAddress(addressData);
+      await createCart(newUser.id);
 
       return res.json({
         success: true,
