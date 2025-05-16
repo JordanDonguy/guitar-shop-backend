@@ -56,7 +56,13 @@ router.post(
       if (existingUser)
         return res.status(400).json({ error: "Email already registered" });
 
-      const newUser = await registerUser({email, password, first_name, last_name, phone_number});
+      const newUser = await registerUser({
+        email,
+        password,
+        first_name,
+        last_name,
+        phone_number,
+      });
 
       const addressData = {
         user_id: newUser.id,
@@ -77,9 +83,9 @@ router.post(
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     }
-  }
+  },
 );
- 
+
 // Login route
 
 router.post(
@@ -88,51 +94,52 @@ router.post(
   validateLogin,
   handleValidation,
   (req, res, next) => {
-  passport.authenticate("local", async (err, user, info) => {
-    if (err) return next(err);
-
-    if (!user) {
-      return res
-        .status(401)
-        .json({ error: info.message || "Invalid credentials" });
-    }
-
-    req.logIn(user, async (err) => {
+    passport.authenticate("local", async (err, user, info) => {
       if (err) return next(err);
 
-      try {
-        // Merge the temporary cart
-        const temporaryCart = JSON.parse(req.body.temporaryCart || "[]");
-        const cart = await getCartByUserId(user.id);
-        const cartItems = await getItemsByCartId(cart.id);
-
-        temporaryCart.forEach((item) => {
-          const existingItem = cartItems.find(
-            (ci) => ci.product_id == item.product_id,
-          );
-          if (existingItem) {
-            existingItem.quantity += item.quantity;
-          } else {
-            cartItems.push({
-              product_id: item.product_id,
-              quantity: item.quantity,
-            });
-          }
-        });
-
-        await saveUserCart(cart.id, cartItems);
-
-        return res.json({
-          success: true,
-          user: { id: user.id, email: user.email },
-        });
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Cart merge failed" });
+      if (!user) {
+        return res
+          .status(401)
+          .json({ error: info.message || "Invalid credentials" });
       }
-    });
-  })(req, res, next);
-});
+
+      req.logIn(user, async (err) => {
+        if (err) return next(err);
+
+        try {
+          // Merge the temporary cart
+          const temporaryCart = JSON.parse(req.body.temporaryCart || "[]");
+          const cart = await getCartByUserId(user.id);
+          const cartItems = await getItemsByCartId(cart.id);
+
+          temporaryCart.forEach((item) => {
+            const existingItem = cartItems.find(
+              (ci) => ci.product_id == item.product_id,
+            );
+            if (existingItem) {
+              existingItem.quantity += item.quantity;
+            } else {
+              cartItems.push({
+                product_id: item.product_id,
+                quantity: item.quantity,
+              });
+            }
+          });
+
+          await saveUserCart(cart.id, cartItems);
+
+          return res.json({
+            success: true,
+            user: { id: user.id, email: user.email },
+          });
+        } catch (error) {
+          console.error(error);
+          return res.status(500).json({ error: "Cart merge failed" });
+        }
+      });
+    })(req, res, next);
+  },
+);
 
 // Logout route
 

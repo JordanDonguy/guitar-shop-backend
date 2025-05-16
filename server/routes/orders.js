@@ -17,7 +17,7 @@ router.get("/", checkAuthenticated, async (req, res) => {
         orders.map(async (order) => {
           const items = await getItemsByOrderId(order.id);
           order.items = items;
-        })
+        }),
       );
     }
 

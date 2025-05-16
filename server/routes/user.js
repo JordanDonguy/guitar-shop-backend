@@ -25,7 +25,7 @@ router.get("/:id", checkAuthenticated, async (req, res) => {
   try {
     const requestedId = String(req.params.id);
     const loggedInUserId = String(req.user.id);
-  
+
     // Deny access if the user is trying to access someone else's data
     if (requestedId !== String(loggedInUserId)) {
       return res.status(403).json({ error: "Unauthorized access" });

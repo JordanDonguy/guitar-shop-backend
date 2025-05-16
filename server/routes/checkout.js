@@ -49,7 +49,8 @@ router.post("/", checkAuthenticated, async (req, res) => {
     if (!address) return res.status(400).json({ error: "No address on file." });
 
     const order = await addNewOrder(userId, address.id, total_price);
-    if (!order) return res.status(500).json({ error: "Failed to create order" });
+    if (!order)
+      return res.status(500).json({ error: "Failed to create order" });
 
     await Promise.all(
       cartItems.map((item) =>

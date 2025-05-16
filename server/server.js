@@ -27,12 +27,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(flash());
 
-app.use(cors({
-  origin: process.env.CLIENT_ORIGIN,
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"]
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_ORIGIN,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
+  }),
+);
 
 app.use(
   session({
@@ -40,7 +42,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       sameSite: "lax",
     },
@@ -86,6 +88,5 @@ app.use((err, req, res) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something broke!" });
 });
-
 
 app.listen(3000);

@@ -4,7 +4,7 @@ const {
   getCartByUserId,
   getItemsByCartId,
   addItemToCart,
-  updateItemInCart
+  updateItemInCart,
 } = require("../models/cartModels");
 const { checkAuthenticated } = require("../middlewares/checkAuth");
 
@@ -13,7 +13,7 @@ router.get("/", checkAuthenticated, async (req, res) => {
     const userId = req.query.userId;
     if (!userId || userId != req.user.id) {
       return res.status(403).json({ error: "Forbidden" });
-    };
+    }
 
     const cart = await getCartByUserId(req.query.userId);
     const cartItems = await getItemsByCartId(cart.id);
@@ -35,13 +35,16 @@ router.get("/", checkAuthenticated, async (req, res) => {
 router.post("/add", checkAuthenticated, async (req, res) => {
   try {
     const { product_id } = req.body;
-    if (!product_id) return res.status(400).json({ error: "Missing product_id" });
+    if (!product_id)
+      return res.status(400).json({ error: "Missing product_id" });
 
     const cart = await getCartByUserId(req.user.id);
     if (!cart) return res.status(404).json({ error: "Cart not found" });
 
     const cartItems = await getItemsByCartId(cart.id);
-    const itemToUpdate = cartItems.find(item => item.product_id == product_id);
+    const itemToUpdate = cartItems.find(
+      (item) => item.product_id == product_id,
+    );
 
     if (itemToUpdate) {
       await updateItemInCart(product_id, cart.id, 1);
