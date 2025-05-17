@@ -10,6 +10,7 @@ const session = require("express-session");
 const cors = require("cors");
 const helmet = require("helmet");
 const csurf = require("csurf");
+
 const rateLimit = require("express-rate-limit");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
@@ -23,9 +24,7 @@ const initializePassport = require("./middlewares/passport-config");
 initializePassport(passport);
 
 // Express setup
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(flash());
+app.use(helmet());
 
 app.use(
   cors({
@@ -35,6 +34,10 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
   }),
 );
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(flash());
 
 app.use(
   session({
@@ -84,9 +87,10 @@ app.use((req, res) => {
   res.status(404).json({ error: "Not Found" });
 });
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something broke!" });
 });
 
-app.listen(3000);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
