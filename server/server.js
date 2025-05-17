@@ -1,6 +1,4 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
+// To use if not on production : require("dotenv").config();
 
 const express = require("express");
 const app = express();
@@ -26,9 +24,7 @@ const initializePassport = require("./middlewares/passport-config");
 initializePassport(passport);
 
 // Express setup
-if (process.env.NODE_ENV === "production") {
-  app.set("trust proxy", 1);
-};
+app.set("trust proxy", 1); // To only use on production
 
 app.use(
   cors({
