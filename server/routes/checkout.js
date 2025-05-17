@@ -54,7 +54,7 @@ router.post("/", checkAuthenticated, async (req, res) => {
 
     await Promise.all(
       cartItems.map((item) =>
-        addItemToOrder(order.id, item.product_id, item.quantity, item.price),
+        addItemToOrder(order.id, item.product_id, item.quantity, Number(item.price)),
       ),
     );
 

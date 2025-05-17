@@ -1,6 +1,7 @@
 const { body } = require("express-validator");
 
 const validateRegister = [
+  
   // User infos validations
   body("email").isEmail().withMessage("Invalid email format").normalizeEmail(),
   body("password")
@@ -10,7 +11,7 @@ const validateRegister = [
   body("last_name").trim().notEmpty().withMessage("Last name is required"),
   body("phone_number")
     .optional({ checkFalsy: true })
-    .isMobilePhone()
+    .isMobilePhone("any")
     .withMessage("Invalid phone number"),
 
   // Address validations
