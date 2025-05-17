@@ -10,6 +10,8 @@ const session = require("express-session");
 const cors = require("cors");
 const helmet = require("helmet");
 const csurf = require("csurf");
+const pgSession = require("connect-pg-simple")(session);
+const pool = require("../db/index");
 
 const rateLimit = require("express-rate-limit");
 const authRoutes = require("./routes/auth");
@@ -24,7 +26,9 @@ const initializePassport = require("./middlewares/passport-config");
 initializePassport(passport);
 
 // Express setup
-app.set("trust proxy", 1)
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+};
 
 app.use(
   cors({
@@ -41,6 +45,11 @@ app.use(flash());
 
 app.use(
   session({
+    store: new pgSession({
+      pool: pool,
+      tableName: "session",
+      errorLog: console.error,
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -51,8 +60,6 @@ app.use(
     },
   }),
 );
-
-app.use(helmet());
 
 app.use(passport.initialize());
 app.use(passport.session());
