@@ -11,7 +11,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const csurf = require("csurf");
 const pgSession = require("connect-pg-simple")(session);
-const pool = require("../db/index");
+const pool = require("./db/index");
 
 const rateLimit = require("express-rate-limit");
 const authRoutes = require("./routes/auth");
