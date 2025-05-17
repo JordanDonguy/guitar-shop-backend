@@ -24,7 +24,7 @@ const initializePassport = require("./middlewares/passport-config");
 initializePassport(passport);
 
 // Express setup
-app.use(helmet());
+app.set("trust proxy", 1)
 
 app.use(
   cors({
@@ -51,6 +51,8 @@ app.use(
     },
   }),
 );
+
+app.use(helmet());
 
 app.use(passport.initialize());
 app.use(passport.session());
