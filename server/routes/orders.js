@@ -8,10 +8,7 @@ const {
 
 router.get("/", checkAuthenticated, async (req, res) => {
   try {
-    const userId = req.query.userId;
-    if (!userId || userId != req.user.id) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
+    const userId = req.user.id;
 
     const orders = await getOrdersByUserId(userId);
 
@@ -24,11 +21,11 @@ router.get("/", checkAuthenticated, async (req, res) => {
 
 router.get("/items", checkAuthenticated, async (req, res) => {
   try {
-    const userId = req.query.userId;
+    const userId = req.user.id;
     const order_id = req.query.order_id;
 
-    if (!userId || userId != req.user.id) {
-      return res.status(403).json({ error: "Forbidden" });
+    if (!order_id) {
+      return res.status(400).json({ error: "order_id is required" });
     }
 
     const items = await getItemsByOrderId(order_id);
