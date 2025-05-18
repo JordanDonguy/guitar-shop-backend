@@ -87,6 +87,11 @@ app.use("/cart", cartRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/orders", ordersRoutes);
 
+app.get('/ping', (req, res) => {
+  res.status(200).send({ message: 'pong' });
+});
+
+
 // Error handling
 app.use((req, res) => {
   res.status(404).json({ error: "Not Found" });
