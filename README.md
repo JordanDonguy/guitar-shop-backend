@@ -37,6 +37,8 @@ This is the backend for the **Guitar Shop** e-commerce application. Built with *
 - **bcrypt** – Password hashing
 - **csurf** – CSRF protection
 - **express-validator** – Input sanitization and validation
+- **Prettier** – Code formatter for consistent styling
+- **ESLint** – Linting tool to catch bugs and enforce code quality
 - **Render** – Backend hosting platform
 - **Supabase** – Hosting for the PostgreSQL DB
 
@@ -46,16 +48,20 @@ This is the backend for the **Guitar Shop** e-commerce application. Built with *
 
 <pre lang="md">
 guitar-shop-backend/
-├── controllers/            # Route handler logic (auth, cart, orders, products)
-├── middleware/             # CSRF setup and CORS settings
-├── models/                 # SQL queries and database helpers
-├── routes/                 # Express route definitions
-├── validators/             # express-validator middleware
-├── .env                    # Environment variables (not tracked)
+├── server
+| ├── db/                    # Pool connection config to db
+│ ├── middleware/            # Passport setup, checkAuth and express-validator
+| |── models/                # SQL queries and database helpers
+│ ├── routes/                # Express route definitions
+│ └── server.js
+├── .env                     # Environment variables (not tracked)
 ├── .gitignore
+├── .prettierignore
+├── .prettierrc
+├── eslint.config.mjs
+├── openapi.yaml
 ├── package.json
-├── server.js               # App entry point
-└── README.md               # This file
+└── README.md                # This file
 </pre>
 
 
@@ -102,11 +108,9 @@ guitar-shop-backend/
 | GET    | `/csrf-token`      | Fetch CSRF token for secure POST requests |
 
   
-Most POST routes require a CSRF token via the csrf-token header.
   
 ## 🧷 CSRF Protection
 All forms or API calls from the frontend must include a CSRF token.
-You can fetch it from:
 
 ## 📄 License
 This project is for educational and portfolio purposes only.
