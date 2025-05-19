@@ -1,0 +1,153 @@
+
+openapi: 3.0.3
+info:
+  title: Guitar Shop API
+  description: API for a full-stack e-commerce guitar shop
+  version: 1.0.0
+servers:
+  - url: https://guitar-shop-backend.onrender.com
+paths:
+  /products:
+    get:
+      summary: Get all products
+      tags: [Products]
+      responses:
+        '200':
+          description: List of products
+
+  /products/{id}:
+    get:
+      summary: Get a specific product
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product details
+
+  /user:
+    get:
+      summary: Get currently logged-in user
+      tags: [Users]
+      responses:
+        '200':
+          description: Authenticated user info
+
+  /user/{id}:
+    patch:
+      summary: Update user info
+      tags: [Users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User updated
+
+  /cart:
+    get:
+      summary: Get user's cart
+      tags: [Cart]
+      responses:
+        '200':
+          description: Cart contents
+
+  /cart/add:
+    post:
+      summary: Add product to cart
+      tags: [Cart]
+      responses:
+        '200':
+          description: Item added
+
+  /cart/updateQuantity:
+    post:
+      summary: Update item quantity in cart
+      tags: [Cart]
+      responses:
+        '200':
+          description: Quantity updated
+
+  /cart/{id}:
+    delete:
+      summary: Remove item from cart
+      tags: [Cart]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Item removed
+
+  /checkout:
+    post:
+      summary: Submit an order
+      tags: [Orders]
+      responses:
+        '200':
+          description: Order processed
+
+  /orders:
+    get:
+      summary: Get all orders for current user
+      tags: [Orders]
+      responses:
+        '200':
+          description: List of orders
+
+  /orders/items:
+    get:
+      summary: Get detailed items for each order
+      tags: [Orders]
+      responses:
+        '200':
+          description: Order items
+
+  /auth/register:
+    get:
+      summary: Get list of countries
+      tags: [Auth]
+      responses:
+        '200':
+          description: Country list
+
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      responses:
+        '201':
+          description: User registered
+
+  /auth/login:
+    post:
+      summary: Log in a user
+      tags: [Auth]
+      responses:
+        '200':
+          description: Login success
+
+  /auth/logout:
+    post:
+      summary: Log out the user
+      tags: [Auth]
+      responses:
+        '200':
+          description: Logout success
+
+  /csrf-token:
+    get:
+      summary: Get CSRF token
+      tags: [Security]
+      responses:
+        '200':
+          description: CSRF token
