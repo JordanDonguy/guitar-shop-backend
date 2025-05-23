@@ -52,8 +52,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "lax", // none
-      secure: false, // true
+      sameSite: "none", // if not in production => lax
+      secure: true, // if not in production => false
       httpOnly: true,
     },
   }),
