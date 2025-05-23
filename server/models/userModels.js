@@ -83,18 +83,11 @@ async function getUserInfosById(id) {
 }
 
 async function updateUserAndAddress(id, data) {
-  const client = await pool.connect();
-
   try {
-    await client.query("BEGIN");
-
+    // User update
     const userFields = ["first_name", "last_name", "email", "phone_number"];
-    const addressFields = ["street", "city", "state", "postal_code", "country"];
-
     let userUpdates = [];
     let userValues = [];
-    let addressUpdates = [];
-    let addressValues = [];
 
     // Build user update query
     userFields.forEach((field) => {
@@ -107,36 +100,50 @@ async function updateUserAndAddress(id, data) {
     if (userUpdates.length > 0) {
       userValues.push(id); // WHERE id = $n
       userUpdates = userUpdates.join(", ");
-      await client.query(
+      await pool.query(
         `UPDATE users SET ${userUpdates} WHERE id = $${userValues.length}`,
         userValues,
       );
     }
 
-    // Build address update query
-    addressFields.forEach((field) => {
-      if (data[field]) {
-        addressValues.push(data[field]);
-        addressUpdates.push(`${field} = $${addressValues.length}`);
-      }
-    });
+    // Address update
+    const isAddress = pool.query(`SELECT id FROM address WHERE user_id = $1`, [
+      id,
+    ]);
 
-    if (addressUpdates.length > 0) {
-      addressValues.push(id); // WHERE user_id = $n
-      addressUpdates = addressUpdates.join(", ");
-      await client.query(
-        `UPDATE address SET ${addressUpdates} WHERE user_id = $${addressValues.length}`,
-        addressValues,
-      );
+    if (isAddress) {
+      const addressFields = [
+        "street",
+        "city",
+        "state",
+        "postal_code",
+        "country",
+      ];
+      let addressUpdates = [];
+      let addressValues = [];
+
+      // Build address update query
+      addressFields.forEach((field) => {
+        if (data[field]) {
+          addressValues.push(data[field]);
+          addressUpdates.push(`${field} = $${addressValues.length}`);
+        }
+      });
+
+      if (addressUpdates.length > 0) {
+        addressValues.push(id); // WHERE user_id = $n
+        addressUpdates = addressUpdates.join(", ");
+        await pool.query(
+          `UPDATE address SET ${addressUpdates} WHERE user_id = $${addressValues.length}`,
+          addressValues,
+        );
+      }
     }
 
-    await client.query("COMMIT");
     return await getUserInfosById(id);
   } catch (error) {
-    await client.query("ROLLBACK");
+    console.error("Error updating user and address infos:", error);
     throw error;
-  } finally {
-    client.release();
   }
 }
 
