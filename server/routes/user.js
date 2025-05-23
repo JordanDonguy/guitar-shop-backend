@@ -6,8 +6,9 @@ const {
   updateUserAndAddress,
 } = require("../models/userModels");
 const { getAllCountries } = require("../models/countryModels");
-
-// Get user informations
+const { registerAddress, getAddressId } = require("../models/addressModels");
+const validateAddress = require("../middlewares/validateAddress");
+const handleValidation = require("../middlewares/handleValidation");
 
 router.get("/", checkAuthenticated, async (req, res) => {
   try {
@@ -60,5 +61,38 @@ router.patch("/:id", checkAuthenticated, async (req, res) => {
       .json({ error: "Something went wrong while updating your profile." });
   }
 });
+
+router.post(
+  "/address",
+  checkAuthenticated,
+  validateAddress,
+  handleValidation,
+  async (req, res) => {
+    try {
+      const { street, city, state, postal_code, country } = req.body;
+
+      const isAddress = await getAddressId(req.user.id);
+      if (isAddress) {
+        return res.status(400).json({ error: "User already has an address" });
+      }
+
+      await registerAddress(
+        req.user.id,
+        street,
+        city,
+        state,
+        postal_code,
+        country,
+      );
+
+      return res.status(201).json({ success: true });
+    } catch (err) {
+      console.error(err);
+      res
+        .status(500)
+        .json({ error: "Something went wrong while creating your address." });
+    }
+  },
+);
 
 module.exports = router;
