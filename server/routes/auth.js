@@ -11,7 +11,6 @@ const validateLogin = require("../middlewares/validateLogin");
 const handleValidation = require("../middlewares/handleValidation");
 
 const { registerUser, findUserByEmail } = require("../models/userModels");
-const { registerAddress } = require("../models/addressModels");
 const { getAllCountries } = require("../models/countryModels");
 const {
   getCartByUserId,
@@ -39,18 +38,7 @@ router.post(
   handleValidation,
   async (req, res) => {
     try {
-      const {
-        email,
-        password,
-        first_name,
-        last_name,
-        phone_number,
-        street,
-        city,
-        state,
-        postal_code,
-        country,
-      } = req.body;
+      const { email, password, first_name, last_name, phone_number } = req.body;
 
       const existingUser = await findUserByEmail(email);
       if (existingUser)
@@ -64,16 +52,6 @@ router.post(
         phone_number,
       });
 
-      const addressData = {
-        user_id: newUser.id,
-        street,
-        city,
-        state,
-        postal_code,
-        country,
-      };
-
-      await registerAddress(addressData);
       await createCart(newUser.id);
 
       return res.json({
