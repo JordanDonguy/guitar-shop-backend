@@ -3,7 +3,7 @@
 This is the backend for the **Guitar Shop** e-commerce application. Built with **Node.js**, **Express**, and **PostgreSQL** (hosted on Supabase), it handles product management, user authentication, cart logic, and order checkout.
 
 > ⚠️ This backend is configured to only accept requests from the deployed frontend:  
-[https://guitar-shop-frontend.netlify.app](https://guitar-shop-frontend.netlify.app)
+> [https://guitar-shop-frontend.netlify.app](https://guitar-shop-frontend.netlify.app)
 
 ---
 
@@ -64,57 +64,63 @@ guitar-shop-backend/
 └── README.md                # This file
 </pre>
 
-
 ## 🧪 API Endpoints
 
 ### 🛍️ Products
-| Method | Endpoint             | Description               |
-|--------|----------------------|---------------------------|
-| GET    | `/products`          | Get all products          |
-| GET    | `/products/:id`      | Get a specific product    |
+
+| Method | Endpoint        | Description            |
+| ------ | --------------- | ---------------------- |
+| GET    | `/products`     | Get all products       |
+| GET    | `/products/:id` | Get a specific product |
 
 ### 👤 Users
-| Method | Endpoint         | Description                      |
-|--------|------------------|----------------------------------|
-| GET    | `/user`          | Get currently logged-in user    |
-| PATCH  | `/user/:id`      | Update user info (address etc.) |
+
+| Method | Endpoint    | Description                     |
+| ------ | ----------- | ------------------------------- |
+| GET    | `/user`     | Get currently logged-in user    |
+| PATCH  | `/user/:id` | Update user info (address etc.) |
 
 ### 🛒 Cart
-| Method | Endpoint                   | Description                        |
-|--------|----------------------------|------------------------------------|
-| GET    | `/cart`                    | Get user's cart                    |
-| POST   | `/cart/add`                | Add product to cart                |
-| POST   | `/cart/updateQuantity`     | Update quantity of an item         |
-| DELETE | `/cart/:id`                | Remove item from cart              |
+
+| Method | Endpoint               | Description                |
+| ------ | ---------------------- | -------------------------- |
+| GET    | `/cart`                | Get user's cart            |
+| POST   | `/cart/add`            | Add product to cart        |
+| POST   | `/cart/updateQuantity` | Update quantity of an item |
+| DELETE | `/cart/:id`            | Remove item from cart      |
 
 ### 🧾 Orders
-| Method | Endpoint           | Description                       |
-|--------|--------------------|-----------------------------------|
-| POST   | `/checkout`        | Submit an order with cart info    |
-| GET    | `/orders`          | Get all orders for current user   |
-| GET    | `/orders/items`    | Get detailed items for each order |
+
+| Method | Endpoint        | Description                       |
+| ------ | --------------- | --------------------------------- |
+| POST   | `/checkout`     | Submit an order with cart info    |
+| GET    | `/orders`       | Get all orders for current user   |
+| GET    | `/orders/items` | Get detailed items for each order |
 
 ### 🔐 Authentication
-| Method | Endpoint            | Description                         |
-|--------|---------------------|-------------------------------------|
-| POST   | `/auth/register`    | Register a new user                 |
-| GET    | `/auth/register`    | Get list of countries (for form)    |
-| POST   | `/auth/login`       | Log in a user                       |
-| POST   | `/auth/logout`      | Log out the current session         |
+
+| Method | Endpoint         | Description                      |
+| ------ | ---------------- | -------------------------------- |
+| POST   | `/auth/register` | Register a new user              |
+| GET    | `/auth/register` | Get list of countries (for form) |
+| POST   | `/auth/login`    | Log in a user                    |
+| POST   | `/auth/logout`   | Log out the current session      |
 
 ### 🛡️ CSRF
-| Method | Endpoint           | Description                    |
-|--------|--------------------|--------------------------------|
-| GET    | `/csrf-token`      | Fetch CSRF token for secure POST requests |
 
-  
-  
+| Method | Endpoint      | Description                               |
+| ------ | ------------- | ----------------------------------------- |
+| GET    | `/csrf-token` | Fetch CSRF token for secure POST requests |
+
 ## 🧷 CSRF Protection
+
 All forms or API calls from the frontend must include a CSRF token.
 
 ## 📄 License
+
 This project is for educational and portfolio purposes only.
 Please do not reuse or redistribute the code without permission.
 
 ## 👤 Author
+
 Developed by Jordan Donguy

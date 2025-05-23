@@ -21,7 +21,6 @@ router.get("/", checkAuthenticated, async (req, res) => {
 
 router.get("/items", checkAuthenticated, async (req, res) => {
   try {
-    const userId = req.user.id;
     const order_id = req.query.order_id;
 
     if (!order_id) {

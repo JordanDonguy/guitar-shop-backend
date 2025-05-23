@@ -1,14 +1,14 @@
 const pool = require("../db/index");
 
 // Register a new address
-async function registerAddress({
+async function registerAddress(
   user_id,
   street,
   city,
   state,
   postal_code,
   country,
-}) {
+) {
   const query = `
         INSERT INTO address (user_id, street, city, state, postal_code, country)
         VALUES ($1, $2, $3, $4, $5, $6)

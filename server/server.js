@@ -1,4 +1,5 @@
-// To use if not on production : require("dotenv").config();
+// To use if not on production :
+// require("dotenv").config();
 
 const express = require("express");
 const app = express();
@@ -18,6 +19,7 @@ const productsRoutes = require("./routes/products");
 const cartRoutes = require("./routes/cart");
 const checkoutRoutes = require("./routes/checkout");
 const ordersRoutes = require("./routes/orders");
+const countriesRoutes = require("./routes/countries");
 
 // Initialize passport
 const initializePassport = require("./middlewares/passport-config");
@@ -50,8 +52,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "none",
-      secure: true,
+      sameSite: "lax", // none
+      secure: false, // true
       httpOnly: true,
     },
   }),
@@ -86,13 +88,14 @@ app.use("/products", productsRoutes);
 app.use("/cart", cartRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/orders", ordersRoutes);
+app.use("/countries", countriesRoutes);
 
 // Error handling
 app.use((req, res) => {
   res.status(404).json({ error: "Not Found" });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something broke!" });
 });

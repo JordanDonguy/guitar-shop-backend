@@ -1,4 +1,3 @@
-// to be used if not in production : require("dotenv").config();
 const { Pool } = require("pg");
 
 const pool = new Pool({
@@ -7,7 +6,7 @@ const pool = new Pool({
   database: process.env.PG_DATABASE,
   password: process.env.PG_PASSWORD,
   port: process.env.PG_PORT,
-  ssl: process.env.PG_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  ssl: process.env.PG_SSL === "true" ? { rejectUnauthorized: false } : false,
   family: 4,
 });
 
