@@ -80,7 +80,33 @@ async function getUserInfosById(id) {
     console.error("Error getting user info by ID:", error);
     throw error;
   }
-}
+};
+
+async function hasPassword(userId) {
+  try {
+    const result = await pool.query(`SELECT password FROM users WHERE id = $1`, [userId]);
+    return !!result.rows[0]?.password;
+  } catch (error) {
+    console.error("Error getting user password infos:", error);
+    throw error;
+  }
+};
+
+async function updatePassword(password, userId) {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const query = `
+    UPDATE users
+    SET password = $1
+    WHERE id = $2
+    `;
+    const result = await pool.query(query, [hashedPassword, userId]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error updating password:", error);
+    throw error;
+  }
+};
 
 async function updateUserAndAddress(id, data) {
   try {
@@ -145,6 +171,45 @@ async function updateUserAndAddress(id, data) {
     console.error("Error updating user and address infos:", error);
     throw error;
   }
+};
+
+async function findUserByGoogleId(googleId) {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM users WHERE google_id = $1`,
+      [googleId]
+    );
+    if (!result.rows[0]) return null;
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error finding user by Google ID:", error);
+    throw error;
+  }
+};
+
+async function createGoogleUser({ googleId, email, first_name, last_name }) {
+  try {
+    const query = `
+      INSERT INTO users (google_id, email, first_name, last_name)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, email, first_name, last_name, created_at
+    `;
+
+    const values = [googleId, email, first_name, last_name];
+
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error creating Google user:", error);
+    throw error;
+  }
+};
+
+async function linkGoogleIdToUser(userId, googleId) {
+  await pool.query('UPDATE users SET google_id = $1 WHERE id = $2', [
+    googleId,
+    userId,
+  ]);
 }
 
 module.exports = {
@@ -152,5 +217,10 @@ module.exports = {
   findUserByEmail,
   findUserById,
   getUserInfosById,
+  hasPassword,
+  updatePassword,
   updateUserAndAddress,
+  findUserByGoogleId,
+  createGoogleUser,
+  linkGoogleIdToUser
 };

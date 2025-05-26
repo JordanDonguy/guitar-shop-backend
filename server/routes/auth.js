@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const mergeTemporaryCart = require("../utils/mergeTemporaryCart");
 
 const {
   checkAuthenticated,
@@ -83,36 +84,16 @@ router.post(
 
       req.logIn(user, async (err) => {
         if (err) return next(err);
-
         try {
-          // Merge the temporary cart
           const temporaryCart = JSON.parse(req.body.temporaryCart || "[]");
-          const cart = await getCartByUserId(user.id);
-          const cartItems = await getItemsByCartId(cart.id);
-
-          temporaryCart.forEach((item) => {
-            const existingItem = cartItems.find(
-              (ci) => ci.product_id == item.product_id,
-            );
-            if (existingItem) {
-              existingItem.quantity += item.quantity;
-            } else {
-              cartItems.push({
-                product_id: item.product_id,
-                quantity: item.quantity,
-              });
-            }
-          });
-
-          await saveUserCart(cart.id, cartItems);
-
-          return res.json({
+          await mergeTemporaryCart(user.id, temporaryCart);
+          return res.status(200).json({
             success: true,
-            user: { id: user.id, email: user.email },
+            user: { id: user.id, email: user.email }
           });
         } catch (error) {
           console.error(error);
-          return res.status(500).json({ error: "Cart merge failed" });
+          res.status(500).json({ error: error.message });
         }
       });
     })(req, res, next);
@@ -129,5 +110,35 @@ router.post("/logout", checkAuthenticated, function (req, res, next) {
     res.json({ success: true });
   });
 });
+
+// Google OAuth
+
+router.get('/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+router.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', async (err, user, info) => {
+    if (err || !user) {
+      return res.redirect('http://localhost:5173/auth/login?status=error');
+    }
+
+    // Log the user in
+    req.logIn(user, (err) => {
+      if (err) {
+        return res.redirect('http://localhost:5173/auth/login?status=error');
+      }
+
+      const isNewUser = info?.isNewUser;
+
+      const redirectURL = isNewUser
+        ? 'http://localhost:5173/?status=success&type=register'
+        : 'http://localhost:5173/?status=success&type=login';
+
+      return res.redirect(redirectURL);
+    });
+  })(req, res, next);
+});
+
 
 module.exports = router;

@@ -74,4 +74,24 @@ router.post("/updateQuantity", checkAuthenticated, async (req, res) => {
   }
 });
 
+router.post('/saveTemporaryCart', async (req, res) => {
+  try {
+    let { temporaryCart } = req.body;
+
+    if (typeof temporaryCart === 'string') {
+      temporaryCart = JSON.parse(temporaryCart);
+    }
+
+    if (!Array.isArray(temporaryCart)) {
+      return res.status(400).json({ error: "Invalid cart format" });
+    }
+
+    req.session.temporaryCart = temporaryCart;
+    res.status(200).json({ message: "Temporary cart saved successfully" });
+  } catch (error) {
+    console.error("Error saving temporary cart:", error);
+    res.status(500).json({ error: "Failed to save temporary cart" });
+  }
+});
+
 module.exports = router;
