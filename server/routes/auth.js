@@ -116,20 +116,20 @@ router.get(
 router.get("/google/callback", (req, res, next) => {
   passport.authenticate("google", async (err, user, info) => {
     if (err || !user) {
-      return res.redirect("http://localhost:5173/auth/login?status=error");
+      return res.redirect("https://guitar-shop-frontend.netlify.app/auth/login?status=error");
     }
 
     // Log the user in
     req.logIn(user, (err) => {
       if (err) {
-        return res.redirect("http://localhost:5173/auth/login?status=error");
+        return res.redirect("https://guitar-shop-frontend.netlify.app/auth/login?status=error");
       }
 
       const isNewUser = info?.isNewUser;
 
       const redirectURL = isNewUser
-        ? "http://localhost:5173/?status=success&type=register"
-        : "http://localhost:5173/?status=success&type=login";
+        ? "https://guitar-shop-frontend.netlify.app/?status=success&type=register"
+        : "https://guitar-shop-frontend.netlify.app/?status=success&type=login";
 
       return res.redirect(redirectURL);
     });
