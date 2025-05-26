@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const { checkAuthenticated } = require("../middlewares/checkAuth");
-const { addNewOrder, addItemToOrder } = require("../models/orderModels");
 const { getAddressId } = require("../models/addressModels");
 const {
   getItemsByCartId,
   clearCart,
   getCartByUserId,
 } = require("../models/cartModels");
+const { addNewOrder, addItemToOrder } = require("../models/orderModels");
 
 function isFakeCardValid(cardNumber, expiry, cvv) {
   const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;

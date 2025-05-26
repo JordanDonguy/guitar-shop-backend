@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 const { checkAuthenticated } = require("../middlewares/checkAuth");
 const {
   getUserInfosById,
+  hasPassword,
+  updatePassword,
   updateUserAndAddress,
+  findUserById,
 } = require("../models/userModels");
 const { getAllCountries } = require("../models/countryModels");
 const { registerAddress, getAddressId } = require("../models/addressModels");
@@ -14,9 +18,9 @@ router.get("/", checkAuthenticated, async (req, res) => {
   try {
     const user = await getUserInfosById(req.user.id);
     if (!user) return res.status(404).json({ error: "User not found" });
-    const countries = await getAllCountries();
+    const hasPwd = await hasPassword(req.user.id);
 
-    res.json({ user, countries, error: null });
+    res.json({ user, hasPwd, error: null });
   } catch (error) {
     res.status(500).json(error);
   }
@@ -40,6 +44,35 @@ router.get("/:id", checkAuthenticated, async (req, res) => {
     res.render("user-profile.ejs", { user: userInfos, error: null, countries });
   } catch (error) {
     res.status(500).send(error);
+  }
+});
+
+router.patch("/password", checkAuthenticated, async (req, res) => {
+  try {
+    const user = await findUserById(req.user.id);
+    const { currentPassword, newPassword } = req.body;
+    
+    const passwordMatches = await bcrypt.compare(currentPassword, user.password);
+    if (!passwordMatches) {
+      return res.status(403).json({ message: "Current password is incorrect" });
+    };
+
+    await updatePassword(newPassword, user.id);
+    res.status(200).json({ success: true })
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Something went wrong while updating your password." });
+  }
+});
+
+router.post("/password", checkAuthenticated, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    await updatePassword (newPassword, req.user.id);
+    res.status(200).json({ success: true })
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Something went wrong while creating your password." });
   }
 });
 
