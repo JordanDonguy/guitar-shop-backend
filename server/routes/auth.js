@@ -13,12 +13,7 @@ const handleValidation = require("../middlewares/handleValidation");
 
 const { registerUser, findUserByEmail } = require("../models/userModels");
 const { getAllCountries } = require("../models/countryModels");
-const {
-  getCartByUserId,
-  getItemsByCartId,
-  saveUserCart,
-  createCart,
-} = require("../models/cartModels");
+const { createCart } = require("../models/cartModels");
 
 // Register route
 
@@ -89,7 +84,7 @@ router.post(
           await mergeTemporaryCart(user.id, temporaryCart);
           return res.status(200).json({
             success: true,
-            user: { id: user.id, email: user.email }
+            user: { id: user.id, email: user.email },
           });
         } catch (error) {
           console.error(error);
@@ -113,32 +108,32 @@ router.post("/logout", checkAuthenticated, function (req, res, next) {
 
 // Google OAuth
 
-router.get('/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
 );
 
-router.get('/google/callback', (req, res, next) => {
-  passport.authenticate('google', async (err, user, info) => {
+router.get("/google/callback", (req, res, next) => {
+  passport.authenticate("google", async (err, user, info) => {
     if (err || !user) {
-      return res.redirect('http://localhost:5173/auth/login?status=error');
+      return res.redirect("http://localhost:5173/auth/login?status=error");
     }
 
     // Log the user in
     req.logIn(user, (err) => {
       if (err) {
-        return res.redirect('http://localhost:5173/auth/login?status=error');
+        return res.redirect("http://localhost:5173/auth/login?status=error");
       }
 
       const isNewUser = info?.isNewUser;
 
       const redirectURL = isNewUser
-        ? 'http://localhost:5173/?status=success&type=register'
-        : 'http://localhost:5173/?status=success&type=login';
+        ? "http://localhost:5173/?status=success&type=register"
+        : "http://localhost:5173/?status=success&type=login";
 
       return res.redirect(redirectURL);
     });
   })(req, res, next);
 });
-
 
 module.exports = router;

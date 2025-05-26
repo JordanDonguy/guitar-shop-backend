@@ -74,11 +74,11 @@ router.post("/updateQuantity", checkAuthenticated, async (req, res) => {
   }
 });
 
-router.post('/saveTemporaryCart', async (req, res) => {
+router.post("/saveTemporaryCart", async (req, res) => {
   try {
     let { temporaryCart } = req.body;
 
-    if (typeof temporaryCart === 'string') {
+    if (typeof temporaryCart === "string") {
       temporaryCart = JSON.parse(temporaryCart);
     }
 

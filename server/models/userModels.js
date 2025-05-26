@@ -80,17 +80,20 @@ async function getUserInfosById(id) {
     console.error("Error getting user info by ID:", error);
     throw error;
   }
-};
+}
 
 async function hasPassword(userId) {
   try {
-    const result = await pool.query(`SELECT password FROM users WHERE id = $1`, [userId]);
+    const result = await pool.query(
+      `SELECT password FROM users WHERE id = $1`,
+      [userId],
+    );
     return !!result.rows[0]?.password;
   } catch (error) {
     console.error("Error getting user password infos:", error);
     throw error;
   }
-};
+}
 
 async function updatePassword(password, userId) {
   try {
@@ -106,7 +109,7 @@ async function updatePassword(password, userId) {
     console.error("Error updating password:", error);
     throw error;
   }
-};
+}
 
 async function updateUserAndAddress(id, data) {
   try {
@@ -171,13 +174,13 @@ async function updateUserAndAddress(id, data) {
     console.error("Error updating user and address infos:", error);
     throw error;
   }
-};
+}
 
 async function findUserByGoogleId(googleId) {
   try {
     const result = await pool.query(
       `SELECT * FROM users WHERE google_id = $1`,
-      [googleId]
+      [googleId],
     );
     if (!result.rows[0]) return null;
     return result.rows[0];
@@ -185,7 +188,7 @@ async function findUserByGoogleId(googleId) {
     console.error("Error finding user by Google ID:", error);
     throw error;
   }
-};
+}
 
 async function createGoogleUser({ googleId, email, first_name, last_name }) {
   try {
@@ -203,10 +206,10 @@ async function createGoogleUser({ googleId, email, first_name, last_name }) {
     console.error("Error creating Google user:", error);
     throw error;
   }
-};
+}
 
 async function linkGoogleIdToUser(userId, googleId) {
-  await pool.query('UPDATE users SET google_id = $1 WHERE id = $2', [
+  await pool.query("UPDATE users SET google_id = $1 WHERE id = $2", [
     googleId,
     userId,
   ]);
@@ -222,5 +225,5 @@ module.exports = {
   updateUserAndAddress,
   findUserByGoogleId,
   createGoogleUser,
-  linkGoogleIdToUser
+  linkGoogleIdToUser,
 };

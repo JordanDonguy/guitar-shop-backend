@@ -51,28 +51,35 @@ router.patch("/password", checkAuthenticated, async (req, res) => {
   try {
     const user = await findUserById(req.user.id);
     const { currentPassword, newPassword } = req.body;
-    
-    const passwordMatches = await bcrypt.compare(currentPassword, user.password);
+
+    const passwordMatches = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
     if (!passwordMatches) {
       return res.status(403).json({ message: "Current password is incorrect" });
-    };
+    }
 
     await updatePassword(newPassword, user.id);
-    res.status(200).json({ success: true })
+    res.status(200).json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Something went wrong while updating your password." });
+    res
+      .status(500)
+      .json({ message: "Something went wrong while updating your password." });
   }
 });
 
 router.post("/password", checkAuthenticated, async (req, res) => {
   try {
     const { newPassword } = req.body;
-    await updatePassword (newPassword, req.user.id);
-    res.status(200).json({ success: true })
+    await updatePassword(newPassword, req.user.id);
+    res.status(200).json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Something went wrong while creating your password." });
+    res
+      .status(500)
+      .json({ message: "Something went wrong while creating your password." });
   }
 });
 
