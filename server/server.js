@@ -20,6 +20,7 @@ const cartRoutes = require("./routes/cart");
 const checkoutRoutes = require("./routes/checkout");
 const ordersRoutes = require("./routes/orders");
 const countriesRoutes = require("./routes/countries");
+const newsletterRoutes = require("./routes/newsletter");
 
 // Initialize passport
 const initializePassport = require("./middlewares/passport-config");
@@ -89,6 +90,7 @@ app.use("/cart", cartRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/orders", ordersRoutes);
 app.use("/countries", countriesRoutes);
+app.use("/newsletter", newsletterRoutes);
 
 // Error handling
 app.use((req, res) => {
