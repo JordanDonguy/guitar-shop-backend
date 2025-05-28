@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+
 const mergeTemporaryCart = require("../utils/mergeTemporaryCart");
+const transporter = require("../utils/emailServices");
+const resetPasswordTemplate = require("../utils/resetPasswordTemplate");
 
 const {
   checkAuthenticated,
@@ -9,11 +12,22 @@ const {
 } = require("../middlewares/checkAuth");
 const validateRegister = require("../middlewares/validateRegister");
 const validateLogin = require("../middlewares/validateLogin");
+const validateEmail = require("../middlewares/validateEmail");
+const validatePassword = require("../middlewares/validatePassword");
 const handleValidation = require("../middlewares/handleValidation");
 
-const { registerUser, findUserByEmail } = require("../models/userModels");
+const {
+  registerUser,
+  findUserByEmail,
+  updatePassword,
+} = require("../models/userModels");
 const { getAllCountries } = require("../models/countryModels");
 const { createCart } = require("../models/cartModels");
+const {
+  getUserByToken,
+  createToken,
+  deleteToken,
+} = require("../models/resetPasswordModels");
 
 // Register route
 
@@ -116,13 +130,17 @@ router.get(
 router.get("/google/callback", (req, res, next) => {
   passport.authenticate("google", async (err, user, info) => {
     if (err || !user) {
-      return res.redirect("https://guitar-shop-frontend.netlify.app/auth/login?status=error");
+      return res.redirect(
+        "https://guitar-shop-frontend.netlify.app/auth/login?status=error",
+      );
     }
 
     // Log the user in
     req.logIn(user, (err) => {
       if (err) {
-        return res.redirect("https://guitar-shop-frontend.netlify.app/auth/login?status=error");
+        return res.redirect(
+          "https://guitar-shop-frontend.netlify.app/auth/login?status=error",
+        );
       }
 
       const isNewUser = info?.isNewUser;
@@ -135,5 +153,77 @@ router.get("/google/callback", (req, res, next) => {
     });
   })(req, res, next);
 });
+
+// Reset password routes
+
+router.post(
+  "/reset-password/request",
+  validateEmail,
+  handleValidation,
+  async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await findUserByEmail(email);
+      if (!user)
+        return res
+          .status(404)
+          .json({ message: "No user found with this email" });
+
+      const token = await createToken(user.id);
+      if (!token)
+        return res
+          .status(400)
+          .json({ message: "Could not create a reset token" });
+
+      const resetLink = `${process.env.CLIENT_ORIGIN}/reset-password?token=${token}`;
+      const html = resetPasswordTemplate(user.first_name, resetLink);
+
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: email,
+        replyTo: process.env.GMAIL_USER,
+        subject: "Password Reset Request",
+        text: `
+          Hi ${user.first_name},
+          You requested to reset your password. Click the link below to proceed:
+          ${resetLink}
+          If you didn’t request this, you can ignore this email.
+          This link will expire in 1 hour.
+        `,
+        html,
+      });
+
+      res
+        .status(200)
+        .json({ message: "Password reset link sent to your email" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error sending reset password email");
+    }
+  },
+);
+
+router.post(
+  "/reset-password/confirm",
+  validatePassword,
+  handleValidation,
+  async (req, res) => {
+    try {
+      const { token, password } = req.body;
+      const user_id = await getUserByToken(token);
+
+      if (!user_id)
+        return res.status(400).json({ message: "Invalid or expired token" });
+
+      await updatePassword(password, user_id);
+      await deleteToken(token);
+
+      res.status(200).json({ message: "Password has been reset successfully" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error updating password");
+    }
+  },
+);
 
 module.exports = router;

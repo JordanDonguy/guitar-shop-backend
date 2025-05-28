@@ -9,38 +9,54 @@ This is the backend for the **Guitar Shop** e-commerce application. Built with *
 
 ## 🚀 Live API
 
-🔗 [https://guitar-shop-backend.onrender.com](https://guitar-shop-backend-production.up.railway.app/)
+🔗 [https://guitar-shop-backend-production.up.railway.app/](https://guitar-shop-backend-production.up.railway.app/)
 
 ---
 
 ## ✨ Features
 
-- 📦 **Product Management** — Fetch individual or multiple products
-- 🧾 **Checkout System** — Create orders with cart contents and user info
-- 🛒 **Cart Handling** — Add/remove/update cart items
-- 🔐 **Session-Based Auth** — Login, logout, and persistent sessions via cookies
-- 🛡️ **CSRF Protection** — All POST requests are protected with CSRF tokens
-- ✅ **Input Validation** — Secure and validated inputs with `express-validator`
-- 🌐 **CORS Config** — Only allows frontend domain access
+- ```📦 Product Management```  
+  _&emsp;→ Fetch individual or multiple products from the database._
+- ```🧾 Checkout System```  
+  _&emsp;→ Create and store orders based on cart contents and user information._
+- ```🛒 Cart Handling```  
+  _&emsp;→ Add, remove, and update items in a user's cart._
+- ```🔐 Session-Based Authentication```  
+  _&emsp;→ User login, logout, and persistent sessions via secure HTTP-only cookies._
+- ```🔐 Google OAuth 2.0 Authentication```  
+  _&emsp;→ Login using Google accounts with secure token handling (via Passport.js or custom implementation)._
+- ```🔒 Password Reset via Email```  
+  _&emsp;→ Users can request a password reset link sent by email with a secure, time-limited token._
+- ```📰 Newsletter Subscription```  
+  _&emsp;→ Visitors can subscribe to newsletters via Nodemailer; handles input validation and confirmation emails._
+- ```🛡️ CSRF Protection```  
+  _&emsp;→ All sensitive POST requests include CSRF tokens for cross-site request forgery protection._
+- ```✅ Input Validation```  
+  _&emsp;→ All user inputs are validated and sanitized using express-validator._
+- ```🌐 CORS Configuration```  
+  _&emsp;→ Strict Cross-Origin Resource Sharing to only allow requests from the frontend domain._
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Node.js** – Runtime environment
-- **Express** – Web framework
-- **PostgreSQL** – Relational database (via Supabase)
-- **express-session** – Session management
-- **Passport.js** – Authentication middleware (session-based)
-- **cors** – Controlled cross-origin access between front and back ends
-- **helmet** – Sets secure HTTP headers for protection
-- **bcrypt** – Password hashing
-- **csurf** – CSRF protection
-- **express-validator** – Input sanitization and validation
-- **Prettier** – Code formatter for consistent styling
-- **ESLint** – Linting tool to catch bugs and enforce code quality
-- **Railway** – Backend hosting platform
-- **Supabase** – Hosting for the PostgreSQL DB
+
+- ```Node.js``` – Runtime environment  
+- ```Express``` – Web framework  
+- ```PostgreSQL``` – Relational database (via Supabase)  
+- ```express-session``` – Session management  
+- ```Passport.js``` – Authentication middleware (session-based)  
+- ```google-passport-oauth2.0``` – Google OAuth 2.0 strategy for Passport.js  
+- ```nodemailer``` – Sending transactional emails (password reset, newsletter, etc.)  
+- ```cors``` – Controlled cross-origin access between front and back ends  
+- ```helmet``` – Sets secure HTTP headers for protection  
+- ```bcrypt``` – Password hashing  
+- ```csurf``` – CSRF protection  
+- ```express-validator``` – Input sanitization and validation  
+- ```Prettier``` – Code formatter for consistent styling  
+- ```ESLint``` – Linting tool to catch bugs and enforce code quality  
+- ```Railway``` – Backend hosting platform  
+- ```Supabase``` – Hosting for the PostgreSQL DB
 
 ---
 
@@ -53,6 +69,7 @@ guitar-shop-backend/
 │ ├── middleware/            # Passport setup, checkAuth and express-validator
 | |── models/                # SQL queries and database helpers
 │ ├── routes/                # Express route definitions
+│ ├── utils/                 # Helper functions
 │ └── server.js
 ├── .env                     # Environment variables (not tracked)
 ├── .gitignore
@@ -99,12 +116,23 @@ guitar-shop-backend/
 
 ### 🔐 Authentication
 
-| Method | Endpoint         | Description                      |
-| ------ | ---------------- | -------------------------------- |
-| POST   | `/auth/register` | Register a new user              |
-| GET    | `/auth/register` | Get list of countries (for form) |
-| POST   | `/auth/login`    | Log in a user                    |
-| POST   | `/auth/logout`   | Log out the current session      |
+| Method | Endpoint                       | Description                       |
+| ------ | ------------------------------ | --------------------------------- |
+| POST   | `/auth/register`               | Register a new user               |
+| GET    | `/auth/register`               | Get list of countries (for form)  |
+| POST   | `/auth/login`                  | Log in a user                     |
+| POST   | `/auth/logout`                 | Log out the current session       |
+| GET    | `/auth/google`                 | Initiate Google OAuth2.0 login    |
+| GET    | `/auth/google/callback`        | Google OAuth2.0 callback URL      |
+| POST   | `/auth/reset-password/request` | Request a password reset email    |
+| POST   | `/auth/reset-password/confirm` | Confirm password reset with token |
+
+### ✉️ Newsletter
+
+| Method | Endpoint                        | Description                       |
+| ------ | ------------------------------- | --------------------------------- |
+| POST   | `/newsletter/subscribe`         | Subscribe to the newsletter       |
+| GET    | `/newsletter/unsubscribe/:token`| Unsubscribe from the newsletter   |
 
 ### 🛡️ CSRF
 

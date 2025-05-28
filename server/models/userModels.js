@@ -209,10 +209,15 @@ async function createGoogleUser({ googleId, email, first_name, last_name }) {
 }
 
 async function linkGoogleIdToUser(userId, googleId) {
-  await pool.query("UPDATE users SET google_id = $1 WHERE id = $2", [
-    googleId,
-    userId,
-  ]);
+  try {
+    await pool.query("UPDATE users SET google_id = $1 WHERE id = $2", [
+      googleId,
+      userId,
+    ]);
+  } catch (error) {
+    console.error("Error linking Google account to user:", error);
+    throw error;
+  }
 }
 
 module.exports = {
