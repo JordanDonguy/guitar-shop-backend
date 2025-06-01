@@ -21,6 +21,7 @@ const checkoutRoutes = require("./routes/checkout");
 const ordersRoutes = require("./routes/orders");
 const countriesRoutes = require("./routes/countries");
 const newsletterRoutes = require("./routes/newsletter");
+const contactRoutes = require("./routes/contact");
 
 // Initialize passport
 const initializePassport = require("./middlewares/passport-config");
@@ -91,6 +92,7 @@ app.use("/checkout", checkoutRoutes);
 app.use("/orders", ordersRoutes);
 app.use("/countries", countriesRoutes);
 app.use("/newsletter", newsletterRoutes);
+app.use("/contact", contactRoutes);
 
 // Error handling
 app.use((req, res) => {
