@@ -12,53 +12,84 @@ async function getFilteredProducts({
   maxPrice = Number.MAX_SAFE_INTEGER,
   inStockOnly = false,
   sortOrder = "ASC",
+  page,
+  limit,
+  searchTerm = "",
 }) {
   try {
-    let query = `
-        SELECT 
-          brands.name AS brand,
-          products.id,
-          products.name,
-          products.price,
-          products.stock,
-          products.image_url
-        FROM products
-        JOIN brands ON products.brand_id = brands.id
-        WHERE products.price BETWEEN $1 AND $2
-      `;
+    let baseQuery = `
+      FROM products
+      JOIN brands ON products.brand_id = brands.id
+      WHERE products.price BETWEEN $1 AND $2
+    `;
 
     const params = [minPrice, maxPrice];
     let paramIndex = params.length;
 
-    // Optional category filter (multiple category IDs)
+    // Optional category filter
     if (categoryIds && categoryIds.length > 0) {
       const placeholders = categoryIds.map(() => `$${++paramIndex}`).join(", ");
-      query += ` AND products.category_id IN (${placeholders})`;
+      baseQuery += ` AND products.category_id IN (${placeholders})`;
       params.push(...categoryIds);
     }
 
     // Optional brand filter
     if (brandIds && brandIds.length > 0) {
       const placeholders = brandIds.map(() => `$${++paramIndex}`).join(", ");
-      query += ` AND products.brand_id IN (${placeholders})`;
+      baseQuery += ` AND products.brand_id IN (${placeholders})`;
       params.push(...brandIds);
     }
 
     // Optional stock filter
     if (inStockOnly) {
-      query += ` AND products.stock > 0`;
+      baseQuery += ` AND products.stock > 0`;
     }
 
-    // Sorting
-    query += ` ORDER BY products.price ${sortOrder.toUpperCase() === "ASC" ? "ASC" : "DESC"}`;
+    // Optional search term
+    if (searchTerm.trim() !== "") {
+      paramIndex++;
+      baseQuery += `
+        AND (
+          LOWER(products.name) LIKE LOWER($${paramIndex})
+          OR LOWER(brands.name) LIKE LOWER($${paramIndex})
+        )
+      `;
+      params.push(`%${searchTerm.trim()}%`);
+    }
 
-    const { rows } = await pool.query(query, params);
-    return rows;
+    // --- Count query ---
+    const countQuery = `SELECT COUNT(*) ${baseQuery}`;
+    const countResult = await pool.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].count, 10);
+
+    // --- Data query with LIMIT/OFFSET ---
+    const offset = (page - 1) * limit;
+    const dataQuery = `
+      SELECT 
+        brands.name AS brand,
+        products.id,
+        products.name,
+        products.price,
+        products.stock,
+        products.image_url
+      ${baseQuery}
+      ORDER BY products.price ${sortOrder.toUpperCase() === "ASC" ? "ASC" : "DESC"}
+      LIMIT ${limit} OFFSET ${offset}
+    `;
+    const dataResult = await pool.query(dataQuery, params);
+
+    return {
+      products: dataResult.rows,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    };
   } catch (error) {
     console.error("Error fetching filtered products:", error);
     throw error;
   }
-}
+};
+
 
 async function getProductById(id) {
   try {
