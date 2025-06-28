@@ -9,7 +9,7 @@ This is the backend for the **Guitar Shop** e-commerce application. Built with *
 
 ## 🚀 Live API
 
-🔗 [https://guitar-shop-backend-production.up.railway.app/](https://guitar-shop-backend-production.up.railway.app/)
+🔗 [https://api.guitar-shop.store/](https://api.guitar-shop.store/)
 
 ---
 
@@ -55,7 +55,7 @@ This is the backend for the **Guitar Shop** e-commerce application. Built with *
 - ```express-validator``` – Input sanitization and validation  
 - ```Prettier``` – Code formatter for consistent styling  
 - ```ESLint``` – Linting tool to catch bugs and enforce code quality  
-- ```Railway``` – Backend hosting platform  
+- ```Northflank``` – Backend hosting platform  
 - ```Supabase``` – Hosting for the PostgreSQL DB
 
 ---
