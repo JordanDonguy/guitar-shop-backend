@@ -4,7 +4,7 @@ info:
   description: API for a full-stack e-commerce guitar shop
   version: 1.0.0
 servers:
-  - url: https://guitar-shop-backend-production.up.railway.app/
+  - url: https://api.guitar-shop.store
 paths:
   /products:
     get:

@@ -131,7 +131,7 @@ router.get("/google/callback", (req, res, next) => {
   passport.authenticate("google", async (err, user, info) => {
     if (err || !user) {
       return res.redirect(
-        "https://guitar-shop-frontend.netlify.app/auth/login?status=error",
+        `${process.env.CLIENT_ORIGIN}/auth/login?status=error`,
       );
     }
 
@@ -139,15 +139,15 @@ router.get("/google/callback", (req, res, next) => {
     req.logIn(user, (err) => {
       if (err) {
         return res.redirect(
-          "https://guitar-shop-frontend.netlify.app/auth/login?status=error",
+          `${process.env.CLIENT_ORIGIN}/auth/login?status=error`,
         );
       }
 
       const isNewUser = info?.isNewUser;
 
       const redirectURL = isNewUser
-        ? "https://guitar-shop-frontend.netlify.app/?status=success&type=register"
-        : "https://guitar-shop-frontend.netlify.app/?status=success&type=login";
+        ? `${process.env.CLIENT_ORIGIN}/?status=success&type=register`
+        : `${process.env.CLIENT_ORIGIN}/?status=success&type=login`;
 
       return res.redirect(redirectURL);
     });
