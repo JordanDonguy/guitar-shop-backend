@@ -3,7 +3,7 @@
 This is the backend for the **Guitar Shop** e-commerce application. Built with **Node.js**, **Express**, and **PostgreSQL** (hosted on Supabase), it handles product management, user authentication, cart logic, and order checkout.
 
 > ⚠️ This backend is configured to only accept requests from the deployed frontend:  
-> [https://guitar-shop-frontend.netlify.app](https://guitar-shop-frontend.netlify.app)
+> [https://app.guitar-shop.store](https://app.guitar-shop.store)
 
 ---
 
@@ -57,6 +57,7 @@ This is the backend for the **Guitar Shop** e-commerce application. Built with *
 - ```ESLint``` – Linting tool to catch bugs and enforce code quality  
 - ```Northflank``` – Backend hosting platform  
 - ```Supabase``` – Hosting for the PostgreSQL DB
+- ```Cloudflare``` – DNS management, CDN caching, SSL, and security 
 
 ---
 
