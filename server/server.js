@@ -11,8 +11,10 @@ const helmet = require("helmet");
 const csurf = require("csurf");
 const pgSession = require("connect-pg-simple")(session);
 const pool = require("./db/index");
-require("dotenv").config();
 const rateLimit = require("express-rate-limit");
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+require("dotenv").config();
 
 // ------------------
 // Routes Imports
@@ -132,6 +134,13 @@ app.get("/", (req, res) => {
 });
 
 // ------------------
+// Swagger / OpenAPI
+// ------------------
+const swaggerDocument = YAML.load("./openapi.yaml");
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// ------------------
 // Error Handling
 // ------------------
 app.use((req, res) => {
@@ -146,9 +155,5 @@ app.use((err, req, res, next) => {
 // ------------------
 // Server Listener
 // ------------------
-app.get("/", (req, res) => {
-  res.json({ status: "ok", message: "Guitar Shop Backend is running." });
-});
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

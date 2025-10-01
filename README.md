@@ -8,7 +8,10 @@ This is the backend for the **Guitar Shop** e-commerce application. Built with *
 
 ## 🚀 Live API
 
-🔗 [https://api.guitar-shop.store/](https://api.guitar-shop.store/)
+🔗 [API Documentation (Swagger / OpenAPI)](https://api.guitar-shop.store/api-docs)
+
+> ⚠️ Note: API endpoints cannot be tested directly from the browser due to cross-origin restrictions. Use your frontend or a tool like Postman to make requests.
+
 
 ---
 

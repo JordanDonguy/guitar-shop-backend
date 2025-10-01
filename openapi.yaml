@@ -1,147 +1,133 @@
 openapi: 3.0.3
 info:
   title: Guitar Shop API
-  description: API for a full-stack e-commerce guitar shop
   version: 1.0.0
+  description: Full API for Guitar Shop backend
 servers:
   - url: https://api.guitar-shop.store
+
 paths:
-  /products:
-    get:
-      summary: Get all products
-      tags: [Products]
-      responses:
-        "200":
-          description: List of products
-
-  /products/{id}:
-    get:
-      summary: Get a specific product
-      tags: [Products]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Product details
-
-  /user:
-    get:
-      summary: Get currently logged-in user
-      tags: [Users]
-      responses:
-        "200":
-          description: Authenticated user info
-
-  /user/{id}:
-    patch:
-      summary: Update user info
-      tags: [Users]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: User updated
-
-  /cart:
-    get:
-      summary: Get user's cart
-      tags: [Cart]
-      responses:
-        "200":
-          description: Cart contents
-
-  /cart/add:
-    post:
-      summary: Add product to cart
-      tags: [Cart]
-      responses:
-        "200":
-          description: Item added
-
-  /cart/updateQuantity:
-    post:
-      summary: Update item quantity in cart
-      tags: [Cart]
-      responses:
-        "200":
-          description: Quantity updated
-
-  /cart/{id}:
-    delete:
-      summary: Remove item from cart
-      tags: [Cart]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Item removed
-
-  /checkout:
-    post:
-      summary: Submit an order
-      tags: [Orders]
-      responses:
-        "200":
-          description: Order processed
-
-  /orders:
-    get:
-      summary: Get all orders for current user
-      tags: [Orders]
-      responses:
-        "200":
-          description: List of orders
-
-  /orders/items:
-    get:
-      summary: Get detailed items for each order
-      tags: [Orders]
-      responses:
-        "200":
-          description: Order items
-
   /auth/register:
     get:
-      summary: Get list of countries
+      summary: Get list of countries for registration form
       tags: [Auth]
       responses:
         "200":
-          description: Country list
-
+          description: List of countries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  countries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: US
+                        name:
+                          type: string
+                          example: United States
     post:
       summary: Register a new user
       tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: Password123
+                first_name:
+                  type: string
+                  example: John
+                last_name:
+                  type: string
+                  example: Doe
+                phone_number:
+                  type: string
+                  example: "+1234567890"
       responses:
-        "201":
-          description: User registered
+        "200":
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "400":
+          description: Email already registered
 
   /auth/login:
     post:
       summary: Log in a user
       tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: Password123
+                temporaryCart:
+                  type: string
+                  description: JSON stringified temporary cart from frontend
+                  example: '[{"productId":1,"quantity":2}]'
       responses:
         "200":
-          description: Login success
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      email:
+                        type: string
+                        example: user@example.com
+        "401":
+          description: Invalid credentials
 
   /auth/logout:
     post:
-      summary: Log out the user
+      summary: Log out the current user
       tags: [Auth]
       responses:
         "200":
-          description: Logout success
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
 
   /auth/google:
     get:
@@ -172,13 +158,24 @@ paths:
               properties:
                 email:
                   type: string
+                  example: user@example.com
       responses:
         "200":
           description: Password reset email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password reset link sent to your email
+        "404":
+          description: User not found
 
   /auth/reset-password/confirm:
     post:
-      summary: Confirm password reset with token
+      summary: Confirm password reset using token
       tags: [Auth]
       requestBody:
         required: true
@@ -189,12 +186,704 @@ paths:
               properties:
                 token:
                   type: string
-                newPassword:
+                  example: abc123token
+                password:
                   type: string
+                  example: NewPassword123
       responses:
         "200":
           description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password has been reset successfully
+        "400":
+          description: Invalid or expired token
+  /user:
+    get:
+      summary: Get currently logged-in user info
+      tags: [Users]
+      responses:
+        "200":
+          description: User info returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      email:
+                        type: string
+                        example: user@example.com
+                      first_name:
+                        type: string
+                        example: John
+                      last_name:
+                        type: string
+                        example: Doe
+                  hasPwd:
+                    type: boolean
+                    example: true
+                  error:
+                    type: string
+                    nullable: true
+        "404":
+          description: User not found
+        "500":
+          description: Internal server error
 
+  /user/{id}:
+    get:
+      summary: Render user profile page (requires authentication)
+      tags: [Users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User profile page rendered
+        "403":
+          description: Unauthorized access
+        "404":
+          description: User information not found
+        "500":
+          description: Internal server error
+
+    patch:
+      summary: Update user profile info
+      tags: [Users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  example: John
+                last_name:
+                  type: string
+                  example: Doe
+                phone_number:
+                  type: string
+                  example: "+1234567890"
+                address:
+                  type: object
+                  properties:
+                    street:
+                      type: string
+                      example: "123 Main St"
+                    city:
+                      type: string
+                      example: "Paris"
+                    state:
+                      type: string
+                      example: "Île-de-France"
+                    postal_code:
+                      type: string
+                      example: "75001"
+                    country:
+                      type: string
+                      example: "FR"
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "403":
+          description: Unauthorized access
+        "500":
+          description: Internal server error
+
+  /user/password:
+    patch:
+      summary: Update existing password (requires current password)
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  example: OldPassword123
+                newPassword:
+                  type: string
+                  example: NewPassword123
+      responses:
+        "200":
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "403":
+          description: Current password is incorrect
+        "500":
+          description: Internal server error
+
+    post:
+      summary: Set new password (no current password required)
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newPassword:
+                  type: string
+                  example: NewPassword123
+      responses:
+        "200":
+          description: Password created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "500":
+          description: Internal server error
+
+  /user/address:
+    post:
+      summary: Register a new address for the user
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                street:
+                  type: string
+                  example: "123 Main St"
+                city:
+                  type: string
+                  example: "Paris"
+                state:
+                  type: string
+                  example: "Île-de-France"
+                postal_code:
+                  type: string
+                  example: "75001"
+                country:
+                  type: string
+                  example: "FR"
+      responses:
+        "201":
+          description: Address created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "400":
+          description: User already has an address
+        "500":
+          description: Internal server error
+  /countries:
+    get:
+      summary: Get all countries
+      tags: [Countries]
+      responses:
+        "200":
+          description: List of all countries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  countries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: US
+                        name:
+                          type: string
+                          example: United States
+        "500":
+          description: Internal server error
+  /products:
+    get:
+      summary: Get all products with optional filters
+      tags: [Products]
+      parameters:
+        - name: categoryId
+          in: query
+          description: Filter by category ID(s)
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: brandId
+          in: query
+          description: Filter by brand ID(s)
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: minPrice
+          in: query
+          description: Minimum price filter
+          required: false
+          schema:
+            type: number
+        - name: maxPrice
+          in: query
+          description: Maximum price filter
+          required: false
+          schema:
+            type: number
+        - name: inStock
+          in: query
+          description: Filter only products in stock
+          required: false
+          schema:
+            type: boolean
+        - name: sort
+          in: query
+          description: Sort by price, "asc" or "desc"
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Pagination page number
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Items per page
+          required: false
+          schema:
+            type: integer
+        - name: search
+          in: query
+          description: Search term
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of filtered products with categories, brands, and total pages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      type: object
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                  brands:
+                    type: array
+                    items:
+                      type: object
+                  totalPages:
+                    type: integer
+        "500":
+          description: Internal server error
+
+  /products/{id}:
+    get:
+      summary: Get a single product by ID
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product:
+                    type: object
+                  isAuthenticated:
+                    type: boolean
+        "500":
+          description: Internal server error
+  /cart:
+    get:
+      summary: Get current user's cart and items
+      tags: [Cart]
+      parameters:
+        - name: userId
+          in: query
+          description: User ID (must match logged-in user)
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Cart details with items and total price
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      type: object
+                  final_price:
+                    type: number
+                  cart_id:
+                    type: integer
+        "403":
+          description: Forbidden (userId mismatch)
+        "500":
+          description: Internal server error
+
+  /cart/add:
+    post:
+      summary: Add a product to the user's cart
+      tags: [Cart]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+      responses:
+        "201":
+          description: Item added to cart
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "400":
+          description: Missing product_id
+        "404":
+          description: Cart not found
+        "500":
+          description: Internal server error
+
+  /cart/updateQuantity:
+    post:
+      summary: Update the quantity of a product in the cart
+      tags: [Cart]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                quantity:
+                  type: integer
+      responses:
+        "200":
+          description: Quantity updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "404":
+          description: Cart not found
+        "500":
+          description: Internal server error
+
+  /cart/saveTemporaryCart:
+    post:
+      summary: Save a temporary cart in session
+      tags: [Cart]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                temporaryCart:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product_id:
+                        type: integer
+                      quantity:
+                        type: integer
+      responses:
+        "200":
+          description: Temporary cart saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "400":
+          description: Invalid cart format
+        "500":
+          description: Failed to save temporary cart
+
+  /checkout:
+    post:
+      summary: Submit an order using card details
+      tags: [Checkout]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cardNumber:
+                  type: string
+                  example: "4111111111111111"
+                expiry:
+                  type: string
+                  example: "12/25"
+                cvv:
+                  type: string
+                  example: "123"
+      responses:
+        "201":
+          description: Order processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "400":
+          description: Bad request (invalid card, empty cart, or no address)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Card details are incorrect. Please check and try again."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  
+  /orders:
+    get:
+      summary: Get all orders for the currently authenticated user
+      tags: [Orders]
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        user_id:
+                          type: integer
+                          example: 1
+                        total_price:
+                          type: number
+                          example: 299.99
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2025-10-01T12:34:56Z"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+  /orders/items:
+    get:
+      summary: Get items for a specific order
+      tags: [Orders]
+      parameters:
+        - name: order_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: List of items for the order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product_id:
+                          type: integer
+                          example: 1
+                        quantity:
+                          type: integer
+                          example: 2
+                        price:
+                          type: number
+                          example: 149.99
+        "400":
+          description: Missing order_id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "order_id is required"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  /contact:
+    post:
+      summary: Send a message via the contact form
+      tags: [Contact]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "john@example.com"
+                message:
+                  type: string
+                  example: "I would like more information about your products."
+      responses:
+        "200":
+          description: Email sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email sent successfully."
+        "400":
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "All fields are required."
+        "500":
+          description: Failed to send email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Failed to send email."
   /newsletter/subscribe:
     post:
       summary: Subscribe to the newsletter
@@ -208,9 +897,49 @@ paths:
               properties:
                 email:
                   type: string
+                  format: email
+                  example: "user@example.com"
       responses:
-        "200":
+        "201":
           description: Subscribed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "400":
+          description: Missing email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email is required"
+        "409":
+          description: Email already subscribed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email already subscribed"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
 
   /newsletter/unsubscribe/{token}:
     get:
@@ -222,14 +951,21 @@ paths:
           required: true
           schema:
             type: string
+            example: "abcdef12345"
       responses:
-        "200":
-          description: Unsubscribed successfully
-
-  /csrf-token:
-    get:
-      summary: Get CSRF token
-      tags: [Security]
-      responses:
-        "200":
-          description: CSRF token
+        "302":
+          description: Redirect to client unsubscribed page
+        "404":
+          description: Invalid or expired unsubscribe token
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Invalid or expired unsubscribe token"
+        "500":
+          description: Server error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Server error"
