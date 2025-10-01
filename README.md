@@ -2,14 +2,19 @@
 
 This is the backend for the **Guitar Shop** e-commerce application. Built with **Node.js**, **Express**, and **PostgreSQL** (hosted on Supabase), it handles product management, user authentication, cart logic, and order checkout.
 
-> ⚠️ This backend is configured to only accept requests from the deployed frontend:  
-> [https://app.guitar-shop.store](https://app.guitar-shop.store)
+> ⚠️ The backend only allows requests from CLIENT_ORIGIN. Make sure your frontend uses that URL in .env when running locally.
 
 ---
 
 ## 🚀 Live API
 
 🔗 [https://api.guitar-shop.store/](https://api.guitar-shop.store/)
+
+---
+
+## 💻 Frontend repo
+🔗 [https://github.com/JordanDonguy/guitar-shop-frontend](https://github.com/JordanDonguy/guitar-shop-frontend)
+
 
 ---
 
@@ -66,6 +71,7 @@ This is the backend for the **Guitar Shop** e-commerce application. Built with *
 <pre lang="md">
 guitar-shop-backend/
 ├── server
+| |── data/                  # Db create tables and seeding scripts
 | ├── db/                    # Pool connection config to db
 │ ├── middleware/            # Passport setup, checkAuth and express-validator
 | |── models/                # SQL queries and database helpers
@@ -144,6 +150,54 @@ guitar-shop-backend/
 ## 🧷 CSRF Protection
 
 All forms or API calls from the frontend must include a CSRF token.
+
+
+# 🧑‍💻 Local Setup
+
+Follow these steps to get the project running locally:
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/your-username/guitar-shop-backend.git
+cd guitar-shop-backend
+```
+
+2. **Install dependencies**
+
+```bash
+npm install
+```
+
+3. **Set up environment variables**
+
+```bash
+cp .env.example .env
+```
+
+* Open `.env` and replace the placeholder values with your local settings.
+
+4. **Initialize the database**
+
+```bash
+npm run db:init
+```
+
+5. **Seed the database**
+
+```bash
+npm run db:seed
+```
+
+6. **Start the development server**
+
+```bash
+npm run dev
+```
+
+The backend should now be running at `http://localhost:3000`.  
+If you need the frontend, you can get the repo [here](https://github.com/JordanDonguy/guitar-shop-frontend).
+
 
 ## 📄 License
 

@@ -1,6 +1,6 @@
-// To use if not on production :
-// require("dotenv").config();
-
+// ------------------
+// Imports & Setup
+// ------------------
 const express = require("express");
 const app = express();
 const passport = require("passport");
@@ -11,8 +11,12 @@ const helmet = require("helmet");
 const csurf = require("csurf");
 const pgSession = require("connect-pg-simple")(session);
 const pool = require("./db/index");
-
+require("dotenv").config();
 const rateLimit = require("express-rate-limit");
+
+// ------------------
+// Routes Imports
+// ------------------
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const productsRoutes = require("./routes/products");
@@ -23,26 +27,52 @@ const countriesRoutes = require("./routes/countries");
 const newsletterRoutes = require("./routes/newsletter");
 const contactRoutes = require("./routes/contact");
 
-// Initialize passport
+// ------------------
+// Passport Initialization
+// ------------------
 const initializePassport = require("./middlewares/passport-config");
 initializePassport(passport);
 
-// Express setup
-app.set("trust proxy", 1); // To only use on production
+// ------------------
+// Security Middleware
+// ------------------
+app.set("trust proxy", 1); // Needed if behind a proxy (Heroku, etc.)
+app.use(helmet()); // Set secure HTTP headers
 
+// ------------------
+// Rate Limiting
+// ------------------
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 300,
+});
+app.use(globalLimiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: "Too many requests, please try again later.",
+});
+app.use("/auth", authLimiter);
+
+// ------------------
+// CORS & Body Parsing
+// ------------------
 app.use(
   cors({
     origin: process.env.CLIENT_ORIGIN,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
-  }),
+  })
 );
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(flash());
 
+// ------------------
+// Session Setup
+// ------------------
 app.use(
   session({
     store: new pgSession({
@@ -54,17 +84,22 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "none", // if not in production => lax
-      secure: true, // if not in production => false
+      sameSite: process.env.COOKIE_SAMESITE || "lax",
+      secure: process.env.COOKIE_SECURE === "true", // True in production
       httpOnly: true,
     },
-  }),
+  })
 );
 
+// ------------------
+// Passport Middleware
+// ------------------
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(helmet());
+// ------------------
+// CSRF Protection
+// ------------------
 app.use(csurf());
 app.use((err, req, res, next) => {
   if (err.code === "EBADCSRFTOKEN") {
@@ -76,14 +111,9 @@ app.get("/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: "Too many requests, please try again later.",
-});
-app.use("/auth", authLimiter);
-
-// Routes setup
+// ------------------
+// Routes Setup
+// ------------------
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/products", productsRoutes);
@@ -94,14 +124,30 @@ app.use("/countries", countriesRoutes);
 app.use("/newsletter", newsletterRoutes);
 app.use("/contact", contactRoutes);
 
-// Error handling
+// ------------------
+// Server Listener / Health Check
+// ------------------
+app.get("/", (req, res) => {
+  res.send("Guitar Shop Backend is running.");
+});
+
+// ------------------
+// Error Handling
+// ------------------
 app.use((req, res) => {
   res.status(404).json({ error: "Not Found" });
 });
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something broke!" });
+});
+
+// ------------------
+// Server Listener
+// ------------------
+app.get("/", (req, res) => {
+  res.json({ status: "ok", message: "Guitar Shop Backend is running." });
 });
 
 const PORT = process.env.PORT || 3000;
