@@ -7,7 +7,7 @@ const {
   clearCart,
   getCartByUserId,
 } = require("../models/cartModels");
-const { addNewOrder, addItemToOrder } = require("../models/orderModels");
+const orderDatamapper = require("../datamappers/order.datamapper");
 
 function isFakeCardValid(cardNumber, expiry, cvv) {
   const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
@@ -48,13 +48,13 @@ router.post("/", checkAuthenticated, async (req, res) => {
     const address = await getAddressId(userId);
     if (!address) return res.status(400).json({ error: "No address on file." });
 
-    const order = await addNewOrder(userId, address.id, total_price);
+    const order = await orderDatamapper.addNewOrder(userId, address.id, total_price);
     if (!order)
       return res.status(500).json({ error: "Failed to create order" });
 
     await Promise.all(
       cartItems.map((item) =>
-        addItemToOrder(
+        orderDatamapper.addItemToOrder(
           order.id,
           item.product_id,
           item.quantity,
