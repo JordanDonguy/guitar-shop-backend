@@ -28,6 +28,7 @@ const ordersRoutes = require("./routes/orders");
 const countryRoutes = require("./routes/country.routes.js");
 const newsletterRoutes = require("./routes/newsletter");
 const contactRoutes = require("./routes/contact");
+const brandRoutes = require("./routes/brand.routes");
 
 // ------------------
 // Passport Initialization
@@ -125,6 +126,7 @@ app.use("/orders", ordersRoutes);
 app.use("/countries", countryRoutes);
 app.use("/newsletter", newsletterRoutes);
 app.use("/contact", contactRoutes);
+app.use("/brands", brandRoutes);
 
 // ------------------
 // Server Listener / Health Check

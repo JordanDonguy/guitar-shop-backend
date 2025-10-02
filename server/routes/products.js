@@ -7,7 +7,7 @@ const {
   convertToEmbedUrl,
 } = require("../models/productsModels");
 const { getAllCategories } = require("../models/categoriesModels");
-const { getAllBrands } = require("../models/brandsModels");
+const brandDatamapper = require("../datamappers/brand.datamapper");
 
 router.get("/", async (req, res) => {
   try {
@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
     });
 
     const categories = await getAllCategories();
-    const brands = await getAllBrands();
+    const brands = await brandDatamapper.findAll();
 
     const products = result.products;
     const totalPages = result.totalPages;
