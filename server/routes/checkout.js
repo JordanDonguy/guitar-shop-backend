@@ -2,11 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { checkAuthenticated } = require("../middlewares/checkAuth");
 const { getAddressId } = require("../models/addressModels");
-const {
-  getItemsByCartId,
-  clearCart,
-  getCartByUserId,
-} = require("../models/cartModels");
+const cartDatamapper = require("../datamappers/cart.datamapper");
 const orderDatamapper = require("../datamappers/order.datamapper");
 
 function isFakeCardValid(cardNumber, expiry, cvv) {
@@ -33,22 +29,22 @@ router.post("/", checkAuthenticated, async (req, res) => {
     }
 
     const userId = req.user.id;
-    const cart = await getCartByUserId(userId);
-    const cartItems = await getItemsByCartId(cart.id);
+    const cart = await cartDatamapper.getCartByUserId(userId);
+    const cartItems = await cartDatamapper.getItemsByCartId(cart.id);
 
     if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({ error: "Your cart is empty." });
     }
 
-    const total_price = cartItems.reduce(
-      (sum, item) => sum + parseFloat(item.total_price),
+    const totalPrice = cartItems.reduce(
+      (sum, item) => sum + parseFloat(item.totalPrice),
       0,
     );
 
     const address = await getAddressId(userId);
     if (!address) return res.status(400).json({ error: "No address on file." });
 
-    const order = await orderDatamapper.addNewOrder(userId, address.id, total_price);
+    const order = await orderDatamapper.addNewOrder(userId, address.id, totalPrice);
     if (!order)
       return res.status(500).json({ error: "Failed to create order" });
 
@@ -56,14 +52,14 @@ router.post("/", checkAuthenticated, async (req, res) => {
       cartItems.map((item) =>
         orderDatamapper.addItemToOrder(
           order.id,
-          item.product_id,
+          item.productId,
           item.quantity,
           Number(item.price),
         ),
       ),
     );
 
-    await clearCart(cart.id);
+    await cartDatamapper.clearCart(cart.id);
 
     return res.status(201).json({ success: true });
   } catch (error) {

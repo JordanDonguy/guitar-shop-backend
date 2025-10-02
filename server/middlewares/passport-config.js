@@ -9,7 +9,7 @@ const {
   linkGoogleIdToUser,
 } = require("../models/userModels");
 const parseFullName = require("../utils/parseFullName");
-const { createCart } = require("../models/cartModels");
+const cartDatamapper = require("../datamappers/cart.datamapper");
 const mergeTemporaryCart = require("../utils/mergeTemporaryCart");
 
 function initialize(passport) {
@@ -69,14 +69,14 @@ function initialize(passport) {
 
           let user = await findUserByGoogleId(googleId);
           if (user) {
-            await mergeTemporaryCart(user.id, temporaryCart);
+            await cartDatamapper.mergeTemporaryCart(user.id, temporaryCart);
             return done(null, user);
           }
 
           user = await findUserByEmail(email);
           if (user) {
             await linkGoogleIdToUser(user.id, googleId);
-            await mergeTemporaryCart(user.id, temporaryCart);
+            await cartDatamapper.mergeTemporaryCart(user.id, temporaryCart);
             return done(null, { ...user, google_id: googleId });
           }
 
@@ -90,8 +90,8 @@ function initialize(passport) {
               first_name,
               last_name,
             });
-            await createCart(user.id);
-            await mergeTemporaryCart(user.id, temporaryCart);
+            await cartDatamapper.createCart(user.id);
+            await cartDatamapper.mergeTemporaryCart(user.id, temporaryCart);
             return done(null, user, { isNewUser: true });
           }
         } catch (err) {

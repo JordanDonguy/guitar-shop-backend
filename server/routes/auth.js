@@ -22,7 +22,7 @@ const {
   updatePassword,
 } = require("../models/userModels");
 const countryController = require("../controllers/country.controller.js");
-const { createCart } = require("../models/cartModels");
+const cartDatamapper = require("../datamappers/cart.datamapper");
 const {
   getUserByToken,
   createToken,
@@ -62,7 +62,7 @@ router.post(
         phone_number,
       });
 
-      await createCart(newUser.id);
+      await cartDatamapper.createCart(newUser.id);
 
       return res.json({
         success: true,
