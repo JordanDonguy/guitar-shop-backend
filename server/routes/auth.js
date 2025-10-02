@@ -21,7 +21,7 @@ const {
   findUserByEmail,
   updatePassword,
 } = require("../models/userModels");
-const { getAllCountries } = require("../models/countryModels");
+const countryController = require("../controllers/country.controller.js");
 const { createCart } = require("../models/cartModels");
 const {
   getUserByToken,
@@ -33,7 +33,7 @@ const {
 
 router.get("/register", checkNotAuthenticated, async (req, res) => {
   try {
-    const countries = await getAllCountries();
+    const countries = await countryController.getAllCountries();
     res.json({ countries });
   } catch (err) {
     console.error(err);

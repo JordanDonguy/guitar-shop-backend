@@ -25,7 +25,7 @@ const productsRoutes = require("./routes/products");
 const cartRoutes = require("./routes/cart");
 const checkoutRoutes = require("./routes/checkout");
 const ordersRoutes = require("./routes/orders");
-const countriesRoutes = require("./routes/countries");
+const countryRoutes = require("./routes/country.routes.js");
 const newsletterRoutes = require("./routes/newsletter");
 const contactRoutes = require("./routes/contact");
 
@@ -122,7 +122,7 @@ app.use("/products", productsRoutes);
 app.use("/cart", cartRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/orders", ordersRoutes);
-app.use("/countries", countriesRoutes);
+app.use("/countries", countryRoutes);
 app.use("/newsletter", newsletterRoutes);
 app.use("/contact", contactRoutes);
 

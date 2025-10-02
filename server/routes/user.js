@@ -9,7 +9,7 @@ const {
   updateUserAndAddress,
   findUserById,
 } = require("../models/userModels");
-const { getAllCountries } = require("../models/countryModels");
+const countryController = require("../controllers/country.controller.js");
 const { registerAddress, getAddressId } = require("../models/addressModels");
 const validateAddress = require("../middlewares/validateAddress");
 const handleValidation = require("../middlewares/handleValidation");
@@ -40,7 +40,7 @@ router.get("/:id", checkAuthenticated, async (req, res) => {
 
     if (!userInfos)
       return res.status(404).send({ error: "User informations not found" });
-    const countries = await getAllCountries();
+    const countries = await countryController.getAllCountries();
     res.render("user-profile.ejs", { user: userInfos, error: null, countries });
   } catch (error) {
     res.status(500).send(error);
