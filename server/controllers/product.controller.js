@@ -1,6 +1,6 @@
 const productDatamapper = require("../datamappers/product.datamapper");
 const brandDatamapper = require("../datamappers/brand.datamapper");
-const { getAllCategories } = require("../models/categoriesModels");
+const categoryDatamapper = require("../datamappers/category.datamapper");
 
 const productController = {
   async getProducts(req, res) {
@@ -37,7 +37,7 @@ const productController = {
         searchTerm,
       });
 
-      const categories = await getAllCategories();
+      const categories = await categoryDatamapper.findAll();
       const brands = await brandDatamapper.findAll();
 
       res.status(200).json({ ...result, categories, brands });
