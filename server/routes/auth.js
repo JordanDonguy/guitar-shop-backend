@@ -23,11 +23,7 @@ const {
 } = require("../models/userModels");
 const countryController = require("../controllers/country.controller.js");
 const cartDatamapper = require("../datamappers/cart.datamapper");
-const {
-  getUserByToken,
-  createToken,
-  deleteToken,
-} = require("../models/resetPasswordModels");
+const passwordResetTokenDatamapper = require("../datamappers/passwordResetToken.datamapper");
 
 // Register route
 
@@ -169,13 +165,13 @@ router.post(
           .status(404)
           .json({ message: "No user found with this email" });
 
-      const token = await createToken(user.id);
-      if (!token)
+      const resetToken = await passwordResetTokenDatamapper.createToken(user.id);
+      if (!resetToken)
         return res
           .status(400)
           .json({ message: "Could not create a reset token" });
 
-      const resetLink = `${process.env.CLIENT_ORIGIN}/reset-password?token=${token}`;
+      const resetLink = `${process.env.CLIENT_ORIGIN}/reset-password?token=${resetToken}`;
       const html = resetPasswordTemplate(user.first_name, resetLink);
 
       await transporter.sendMail({
@@ -210,20 +206,20 @@ router.post(
   async (req, res) => {
     try {
       const { token, password } = req.body;
-      const user_id = await getUserByToken(token);
 
-      if (!user_id)
+      const resetToken = await passwordResetTokenDatamapper.getUserByToken(token);
+      if (!resetToken)
         return res.status(400).json({ message: "Invalid or expired token" });
 
-      await updatePassword(password, user_id);
-      await deleteToken(token);
+      await updatePassword(password, resetToken.userId);
+      await passwordResetTokenDatamapper.deleteToken(token);
 
       res.status(200).json({ message: "Password has been reset successfully" });
     } catch (error) {
       console.error(error);
       res.status(500).send("Error updating password");
     }
-  },
+  }
 );
 
 module.exports = router;
