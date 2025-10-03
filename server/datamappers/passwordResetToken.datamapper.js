@@ -5,12 +5,12 @@ const PasswordResetToken = require("../models/passwordResetToken.model");
 const passwordResetTokenDatamapper = {
   async getUserByToken(token) {
     try {
-      console.log(token)
+      console.log(token);
       const result = await pool.query(
         `SELECT user_id, token, expires_at, created_at
          FROM password_reset_tokens
          WHERE token = $1 AND expires_at > NOW()`,
-        [token]
+        [token],
       );
 
       return result.rows[0] ? new PasswordResetToken(result.rows[0]) : null;
@@ -30,7 +30,7 @@ const passwordResetTokenDatamapper = {
        ON CONFLICT (user_id)
        DO UPDATE SET token = EXCLUDED.token, expires_at = NOW() + interval '1 hour', created_at = NOW()
        RETURNING token`,
-        [userId, token]
+        [userId, token],
       );
 
       return result.rows[0] ? result.rows[0].token : null;

@@ -737,7 +737,7 @@ paths:
                   error:
                     type: string
                     example: "Internal server error"
-  
+
   /orders:
     get:
       summary: Get all orders for the currently authenticated user

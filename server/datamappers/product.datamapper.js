@@ -65,7 +65,7 @@ const productDatamapper = {
     `;
     const dataResult = await pool.query(dataQuery, params);
 
-    const products = dataResult.rows.map(row => new Product(row));
+    const products = dataResult.rows.map((row) => new Product(row));
 
     return {
       products,

@@ -6,7 +6,7 @@ const newsletterDatamapper = {
   async getSubscriberByEmail(email) {
     const result = await pool.query(
       "SELECT * FROM newsletter_subscribers WHERE email = $1",
-      [email]
+      [email],
     );
     return result.rows[0] ? new NewsletterSubscriber(result.rows[0]) : null;
   },
@@ -14,7 +14,7 @@ const newsletterDatamapper = {
   async getSubscriberByToken(token) {
     const result = await pool.query(
       "SELECT * FROM newsletter_subscribers WHERE token = $1",
-      [token]
+      [token],
     );
     return result.rows[0] ? new NewsletterSubscriber(result.rows[0]) : null;
   },
@@ -23,7 +23,7 @@ const newsletterDatamapper = {
     const token = uuidv4();
     const result = await pool.query(
       "INSERT INTO newsletter_subscribers (email, token) VALUES ($1, $2) RETURNING *",
-      [email, token]
+      [email, token],
     );
     return new NewsletterSubscriber(result.rows[0]);
   },
@@ -31,7 +31,7 @@ const newsletterDatamapper = {
   async unsubscribeByToken(token) {
     const result = await pool.query(
       "DELETE FROM newsletter_subscribers WHERE token = $1 RETURNING *",
-      [token]
+      [token],
     );
     return result.rows[0] ? new NewsletterSubscriber(result.rows[0]) : null;
   },

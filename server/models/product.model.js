@@ -1,5 +1,15 @@
 class Product {
-  constructor({ id, name, brand, description, price, stock, imageUrl, imageUrl2, videoUrl }) {
+  constructor({
+    id,
+    name,
+    brand,
+    description,
+    price,
+    stock,
+    imageUrl,
+    imageUrl2,
+    videoUrl,
+  }) {
     this.id = id;
     this.name = name;
     this.brand = brand;

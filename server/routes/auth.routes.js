@@ -2,11 +2,14 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 
-const { checkAuthenticated, checkNotAuthenticated } = require("../middlewares/checkAuth");
+const {
+  checkAuthenticated,
+  checkNotAuthenticated,
+} = require("../middlewares/checkAuth");
 const validateRegister = require("../middlewares/validateRegister");
 const validateLogin = require("../middlewares/validateLogin");
 const validateEmail = require("../middlewares/validateEmail");
-const validatePassword = require("../middlewares/validatePassword");
+const validatePasswordAndToken = require("../middlewares/validatePasswordAndToken");
 const handleValidation = require("../middlewares/handleValidation");
 
 const authController = require("../controllers/auth.controller");
@@ -17,7 +20,7 @@ router.post(
   checkNotAuthenticated,
   validateRegister,
   handleValidation,
-  authController.register
+  authController.register,
 );
 
 // Login
@@ -26,14 +29,17 @@ router.post(
   checkNotAuthenticated,
   validateLogin,
   handleValidation,
-  authController.login
+  authController.login,
 );
 
 // Logout
 router.post("/logout", checkAuthenticated, authController.logout);
 
 // Google OAuth
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
+);
 router.get("/google/callback", authController.googleCallback);
 
 // Reset password
@@ -41,14 +47,14 @@ router.post(
   "/reset-password/request",
   validateEmail,
   handleValidation,
-  authController.requestPasswordReset
+  authController.requestPasswordReset,
 );
 
 router.post(
   "/reset-password/confirm",
-  validatePassword,
+  validatePasswordAndToken,
   handleValidation,
-  authController.confirmPasswordReset
+  authController.confirmPasswordReset,
 );
 
 module.exports = router;

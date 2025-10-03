@@ -38,7 +38,7 @@ const cartDatamapper = {
       WHERE cart_id = $1
     `;
     const result = await pool.query(query, [cartId]);
-    return result.rows.map(row => new CartItem(row));
+    return result.rows.map((row) => new CartItem(row));
   },
 
   async addItemToCart(productId, cartId, quantity) {
@@ -72,7 +72,11 @@ const cartDatamapper = {
     const currentQty = current.rows[0].quantity;
 
     if (quantity > 0 || currentQty + quantity > 0) {
-      const result = await pool.query(updateQuery, [productId, cartId, quantity]);
+      const result = await pool.query(updateQuery, [
+        productId,
+        cartId,
+        quantity,
+      ]);
       return new CartItem(result.rows[0]);
     } else {
       const result = await pool.query(removeQuery, [productId, cartId]);
@@ -85,7 +89,7 @@ const cartDatamapper = {
     for (const item of userCart) {
       await pool.query(
         `INSERT INTO cart_items (cart_id, product_id, quantity) VALUES ($1, $2, $3)`,
-        [cartId, item.productId, item.quantity]
+        [cartId, item.productId, item.quantity],
       );
     }
   },

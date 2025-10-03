@@ -5,7 +5,11 @@ const { checkAuthenticated } = require("../middlewares/checkAuth");
 
 router.get("/", checkAuthenticated, cartController.getCart);
 router.post("/add", checkAuthenticated, cartController.addItem);
-router.post("/updateQuantity", checkAuthenticated, cartController.updateQuantity);
+router.post(
+  "/updateQuantity",
+  checkAuthenticated,
+  cartController.updateQuantity,
+);
 router.post("/saveTemporaryCart", cartController.saveTemporaryCart);
 
 module.exports = router;

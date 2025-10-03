@@ -24,7 +24,7 @@ const addressDatamapper = {
       const result = await pool.query(
         `SELECT id, user_id, street, city, state, postal_code, country
          FROM address WHERE user_id = $1`,
-        [userId]
+        [userId],
       );
 
       return result.rows[0] ? new Address(result.rows[0]) : null;

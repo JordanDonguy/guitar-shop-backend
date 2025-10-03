@@ -1,5 +1,15 @@
 class Order {
-  constructor({ id, user_id, shipping_address_id, total_price, status, payment_method, created_at, first_name, last_name }) {
+  constructor({
+    id,
+    user_id,
+    shipping_address_id,
+    total_price,
+    status,
+    payment_method,
+    created_at,
+    first_name,
+    last_name,
+  }) {
     this.id = id;
     this.userId = user_id;
     this.shippingAddressId = shipping_address_id;
@@ -13,7 +23,15 @@ class Order {
 }
 
 class OrderItem {
-  constructor({ order_id, product_id, quantity, unit_price, brand_name, name, image_url }) {
+  constructor({
+    order_id,
+    product_id,
+    quantity,
+    unit_price,
+    brand_name,
+    name,
+    image_url,
+  }) {
     this.orderId = order_id;
     this.productId = product_id;
     this.quantity = quantity;

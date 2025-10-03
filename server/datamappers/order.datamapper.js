@@ -40,7 +40,7 @@ const orderDatamapper = {
       JOIN users ON orders.user_id = users.id
       WHERE user_id = $1`;
     const result = await pool.query(query, [userId]);
-    return result.rows.map(row => new Order(row));
+    return result.rows.map((row) => new Order(row));
   },
 
   async getItemsByOrderId(orderId) {
@@ -58,7 +58,7 @@ const orderDatamapper = {
       JOIN brands ON products.brand_id = brands.id
       WHERE order_items.order_id = $1`;
     const result = await pool.query(query, [orderId]);
-    return result.rows.map(row => new OrderItem(row));
+    return result.rows.map((row) => new OrderItem(row));
   },
 };
 

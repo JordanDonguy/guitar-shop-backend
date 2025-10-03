@@ -11,7 +11,8 @@ const authController = {
     try {
       const { email, password, first_name, last_name, phone_number } = req.body;
       const existingUser = await userDatamapper.findByEmail(email);
-      if (existingUser) return res.status(400).json({ error: "Email already registered" });
+      if (existingUser)
+        return res.status(400).json({ error: "Email already registered" });
 
       const newUser = await userDatamapper.register({
         email,
@@ -34,7 +35,9 @@ const authController = {
     passport.authenticate("local", async (err, user, info) => {
       if (err) return next(err);
       if (!user) {
-        return res.status(401).json({ error: info.message || "Invalid credentials" });
+        return res
+          .status(401)
+          .json({ error: info.message || "Invalid credentials" });
       }
 
       req.logIn(user, async (err) => {
@@ -64,12 +67,16 @@ const authController = {
   googleCallback(req, res, next) {
     passport.authenticate("google", (err, user, info) => {
       if (err || !user) {
-        return res.redirect(`${process.env.CLIENT_ORIGIN}/auth/login?status=error`);
+        return res.redirect(
+          `${process.env.CLIENT_ORIGIN}/auth/login?status=error`,
+        );
       }
 
       req.logIn(user, (err) => {
         if (err) {
-          return res.redirect(`${process.env.CLIENT_ORIGIN}/auth/login?status=error`);
+          return res.redirect(
+            `${process.env.CLIENT_ORIGIN}/auth/login?status=error`,
+          );
         }
 
         const isNewUser = info?.isNewUser;
@@ -86,10 +93,18 @@ const authController = {
     try {
       const { email } = req.body;
       const user = await userDatamapper.findByEmail(email);
-      if (!user) return res.status(404).json({ message: "No user found with this email" });
+      if (!user)
+        return res
+          .status(404)
+          .json({ message: "No user found with this email" });
 
-      const resetToken = await passwordResetTokenDatamapper.createToken(user.id);
-      if (!resetToken) return res.status(400).json({ message: "Could not create a reset token" });
+      const resetToken = await passwordResetTokenDatamapper.createToken(
+        user.id,
+      );
+      if (!resetToken)
+        return res
+          .status(400)
+          .json({ message: "Could not create a reset token" });
 
       const resetLink = `${process.env.CLIENT_ORIGIN}/reset-password?token=${resetToken}`;
       const html = resetPasswordTemplate(user.firstName, resetLink);
@@ -109,7 +124,9 @@ const authController = {
         html,
       });
 
-      res.status(200).json({ message: "Password reset link sent to your email" });
+      res
+        .status(200)
+        .json({ message: "Password reset link sent to your email" });
     } catch (error) {
       console.error(error);
       res.status(500).send("Error sending reset password email");
@@ -120,8 +137,10 @@ const authController = {
     try {
       const { token, password } = req.body;
 
-      const resetToken = await passwordResetTokenDatamapper.getUserByToken(token);
-      if (!resetToken) return res.status(400).json({ message: "Invalid or expired token" });
+      const resetToken =
+        await passwordResetTokenDatamapper.getUserByToken(token);
+      if (!resetToken)
+        return res.status(400).json({ message: "Invalid or expired token" });
 
       await userDatamapper.updatePassword(resetToken.userId, password);
       await passwordResetTokenDatamapper.deleteToken(token);

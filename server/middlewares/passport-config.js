@@ -1,14 +1,8 @@
 const LocalStrategy = require("passport-local");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const bcrypt = require("bcrypt");
-const {
-  findUserByEmail,
-  findUserById,
-  findUserByGoogleId,
-  createGoogleUser,
-  linkGoogleIdToUser,
-} = require("../models/userModels");
 const parseFullName = require("../utils/parseFullName");
+const userDatamapper = require("../datamappers/user.datamapper");
 const cartDatamapper = require("../datamappers/cart.datamapper");
 const mergeTemporaryCart = require("../utils/mergeTemporaryCart");
 
@@ -17,7 +11,7 @@ function initialize(passport) {
   const authenticateUser = async (email, password, done) => {
     let user;
     try {
-      user = await findUserByEmail(email);
+      user = await userDatamapper.findByEmail(email);
     } catch (err) {
       return done(err);
     }
@@ -26,7 +20,7 @@ function initialize(passport) {
       return done(null, false, { message: "No user found with that email" });
     }
 
-    if (!user.password) {
+    if (!user.hasPassword) {
       return done(null, false, {
         message:
           "This account was created via Google. Please login with Google or create a password.",
@@ -67,15 +61,15 @@ function initialize(passport) {
           const googleId = profile.id;
           const temporaryCart = req.session.temporaryCart || [];
 
-          let user = await findUserByGoogleId(googleId);
+          let user = await userDatamapper.findByGoogleId(googleId);
           if (user) {
             await mergeTemporaryCart(user.id, temporaryCart);
             return done(null, user);
           }
 
-          user = await findUserByEmail(email);
+          user = await userDatamapper.findByEmail(email);
           if (user) {
-            await linkGoogleIdToUser(user.id, googleId);
+            await userDatamapper.linkGoogleIdToUser(user.id, googleId);
             await mergeTemporaryCart(user.id, temporaryCart);
             return done(null, { ...user, google_id: googleId });
           }
@@ -84,7 +78,7 @@ function initialize(passport) {
             const { first_name, last_name } = parseFullName(
               profile.displayName,
             );
-            user = await createGoogleUser({
+            user = await userDatamapper.createGoogleUser({
               googleId: googleId,
               email: email,
               first_name,
@@ -110,7 +104,7 @@ function initialize(passport) {
   // Deserialize user from session
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await findUserById(id);
+      const user = await userDatamapper.findById(id);
       done(null, user);
     } catch (err) {
       done(err);

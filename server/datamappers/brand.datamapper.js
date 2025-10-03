@@ -5,7 +5,7 @@ const brandDatamapper = {
   async findAll() {
     try {
       const result = await pool.query("SELECT * FROM brands");
-      return result.rows.map(row => new Brand(row));
+      return result.rows.map((row) => new Brand(row));
     } catch (error) {
       console.error("Error fetching brands:", error);
       throw error;

@@ -9,7 +9,8 @@ const newsletterController = {
 
     try {
       const existing = await newsletterDatamapper.getSubscriberByEmail(email);
-      if (existing) return res.status(409).json({ message: "Email already subscribed" });
+      if (existing)
+        return res.status(409).json({ message: "Email already subscribed" });
 
       const newSubscriber = await newsletterDatamapper.subscribeUser(email);
       const unsubscribeUrl = `${process.env.SERVER_ORIGIN}/newsletter/unsubscribe/${newSubscriber.token}`;
@@ -41,7 +42,8 @@ const newsletterController = {
     const { token } = req.params;
     try {
       const unsubscribed = await newsletterDatamapper.unsubscribeByToken(token);
-      if (!unsubscribed) return res.status(404).send("Invalid or expired unsubscribe token");
+      if (!unsubscribed)
+        return res.status(404).send("Invalid or expired unsubscribe token");
       res.redirect(`${process.env.CLIENT_ORIGIN}/unsubscribed`);
     } catch (err) {
       console.error("Unsubscribe error:", err);
