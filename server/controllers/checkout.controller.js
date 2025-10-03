@@ -1,6 +1,6 @@
 const cartDatamapper = require("../datamappers/cart.datamapper");
 const orderDatamapper = require("../datamappers/order.datamapper");
-const { getAddressId } = require("../models/addressModels");
+const addressDatamapper = require("../datamappers/address.datamapper");
 
 function isFakeCardValid(cardNumber, expiry, cvv) {
   const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
@@ -25,7 +25,7 @@ const checkoutController = {
 
       const totalPrice = cartItems.reduce((sum, item) => sum + Number(item.totalPrice), 0);
 
-      const address = await getAddressId(userId);
+      const address = await addressDatamapper.findByUserId(userId);
       if (!address) return res.status(400).json({ error: "No address on file." });
 
       const order = await orderDatamapper.addNewOrder(userId, address.id, totalPrice);

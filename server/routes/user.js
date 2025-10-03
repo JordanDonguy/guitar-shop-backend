@@ -10,7 +10,7 @@ const {
   findUserById,
 } = require("../models/userModels");
 const countryController = require("../controllers/country.controller.js");
-const { registerAddress, getAddressId } = require("../models/addressModels");
+const addressDatamapper = require("../datamappers/address.datamapper");
 const validateAddress = require("../middlewares/validateAddress");
 const handleValidation = require("../middlewares/handleValidation");
 
