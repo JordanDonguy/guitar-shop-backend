@@ -26,7 +26,7 @@ const cartRoutes = require("./routes/cart.routes.js");
 const checkoutRoutes = require("./routes/checkout.routes.js");
 const orderRoutes = require("./routes/order.routes.js");
 const countryRoutes = require("./routes/country.routes.js");
-const newsletterRoutes = require("./routes/newsletter");
+const newsletterRoutes = require("./routes/newsletter.routes.js");
 const contactRoutes = require("./routes/contact");
 const brandRoutes = require("./routes/brand.routes");
 
