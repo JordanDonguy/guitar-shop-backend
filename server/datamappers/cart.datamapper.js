@@ -2,6 +2,16 @@ const pool = require("../db/index");
 const { Cart, CartItem } = require("../models/cart.model");
 
 const cartDatamapper = {
+  async createCart(userId) {
+    const query = `
+      INSERT INTO shopping_cart (user_id)
+      VALUES ($1)
+      RETURNING id, user_id
+    `;
+    const result = await pool.query(query, [userId]);
+    return new Cart(result.rows[0]);
+  },
+
   async getCartByUserId(userId) {
     const query = `SELECT id, user_id FROM shopping_cart WHERE user_id = $1`;
     const result = await pool.query(query, [userId]);

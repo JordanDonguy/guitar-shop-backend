@@ -1,11 +1,11 @@
 const bcrypt = require("bcrypt");
 const userDatamapper = require("../datamappers/user.datamapper");
+const addressDatamapper = require("../datamappers/address.datamapper");
 
 const userController = {
   async getProfile(req, res) {
     try {
       const user = await userDatamapper.getUserWithAddress(req.user.id);
-      console.log(user)
       if (!user) return res.status(404).json({ error: "User not found" });
       res.json({ user });
     } catch (err) {
@@ -36,6 +36,16 @@ const userController = {
       res.json({ success: true, user: updatedUser });
     } catch (err) {
       res.status(500).json({ error: "Failed updating profile" });
+    }
+  },
+
+  async createAddress(req, res) {
+    try {
+      const { street, city, state, postalCode, country } = req.body
+      const userAddress = await addressDatamapper.registerAddress(req.user.id, street, city, state, postalCode, country);
+      res.json({ success: true, address: userAddress});
+    } catch (err) {
+      res.status(500).json({ error: "Failed creating address" });
     }
   }
 };
