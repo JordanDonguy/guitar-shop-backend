@@ -19,15 +19,16 @@ require("dotenv").config();
 // ------------------
 // Routes Imports
 // ------------------
-const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/user");
-const productsRoutes = require("./routes/products");
-const cartRoutes = require("./routes/cart");
-const checkoutRoutes = require("./routes/checkout");
-const ordersRoutes = require("./routes/orders");
-const countriesRoutes = require("./routes/countries");
-const newsletterRoutes = require("./routes/newsletter");
-const contactRoutes = require("./routes/contact");
+const authRoutes = require("./routes/auth.routes.js");
+const userRoutes = require("./routes/user.routes.js");
+const productsRoutes = require("./routes/product.routes.js");
+const cartRoutes = require("./routes/cart.routes.js");
+const checkoutRoutes = require("./routes/checkout.routes.js");
+const orderRoutes = require("./routes/order.routes.js");
+const countryRoutes = require("./routes/country.routes.js");
+const newsletterRoutes = require("./routes/newsletter.routes.js");
+const contactRoutes = require("./routes/contact.routes.js");
+const brandRoutes = require("./routes/brand.routes");
 
 // ------------------
 // Passport Initialization
@@ -66,7 +67,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
-  })
+  }),
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -90,7 +91,7 @@ app.use(
       secure: process.env.COOKIE_SECURE === "true", // True in production
       httpOnly: true,
     },
-  })
+  }),
 );
 
 // ------------------
@@ -121,10 +122,11 @@ app.use("/user", userRoutes);
 app.use("/products", productsRoutes);
 app.use("/cart", cartRoutes);
 app.use("/checkout", checkoutRoutes);
-app.use("/orders", ordersRoutes);
-app.use("/countries", countriesRoutes);
+app.use("/orders", orderRoutes);
+app.use("/countries", countryRoutes);
 app.use("/newsletter", newsletterRoutes);
 app.use("/contact", contactRoutes);
+app.use("/brands", brandRoutes);
 
 // ------------------
 // Server Listener / Health Check
@@ -147,7 +149,7 @@ app.use((req, res) => {
   res.status(404).json({ error: "Not Found" });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something broke!" });
 });

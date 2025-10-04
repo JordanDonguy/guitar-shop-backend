@@ -12,60 +12,58 @@ This is the backend for the **Guitar Shop** e-commerce application. Built with *
 
 > ⚠️ Note: API endpoints cannot be tested directly from the browser due to cross-origin restrictions. Use your frontend or a tool like Postman to make requests.
 
-
 ---
 
 ## 💻 Frontend repo
-🔗 [https://github.com/JordanDonguy/guitar-shop-frontend](https://github.com/JordanDonguy/guitar-shop-frontend)
 
+🔗 [https://github.com/JordanDonguy/guitar-shop-frontend](https://github.com/JordanDonguy/guitar-shop-frontend)
 
 ---
 
 ## ✨ Features
 
-- ```📦 Product Management```  
+- `📦 Product Management`  
   _&emsp;→ Fetch individual or multiple products from the database._
-- ```🧾 Checkout System```  
+- `🧾 Checkout System`  
   _&emsp;→ Create and store orders based on cart contents and user information._
-- ```🛒 Cart Handling```  
+- `🛒 Cart Handling`  
   _&emsp;→ Add, remove, and update items in a user's cart._
-- ```🔐 Session-Based Authentication```  
+- `🔐 Session-Based Authentication`  
   _&emsp;→ User login, logout, and persistent sessions via secure HTTP-only cookies._
-- ```🔐 Google OAuth 2.0 Authentication```  
+- `🔐 Google OAuth 2.0 Authentication`  
   _&emsp;→ Login using Google accounts with secure token handling (via Passport.js or custom implementation)._
-- ```🔒 Password Reset via Email```  
+- `🔒 Password Reset via Email`  
   _&emsp;→ Users can request a password reset link sent by email with a secure, time-limited token._
-- ```📰 Newsletter Subscription```  
+- `📰 Newsletter Subscription`  
   _&emsp;→ Visitors can subscribe to newsletters via Nodemailer; handles input validation and confirmation emails._
-- ```🛡️ CSRF Protection```  
+- `🛡️ CSRF Protection`  
   _&emsp;→ All sensitive POST requests include CSRF tokens for cross-site request forgery protection._
-- ```✅ Input Validation```  
+- `✅ Input Validation`  
   _&emsp;→ All user inputs are validated and sanitized using express-validator._
-- ```🌐 CORS Configuration```  
+- `🌐 CORS Configuration`  
   _&emsp;→ Strict Cross-Origin Resource Sharing to only allow requests from the frontend domain._
 
 ---
 
 ## 🛠️ Tech Stack
 
-
-- ```Node.js``` – Runtime environment  
-- ```Express``` – Web framework  
-- ```PostgreSQL``` – Relational database (via Supabase)  
-- ```express-session``` – Session management  
-- ```Passport.js``` – Authentication middleware (session-based)  
-- ```google-passport-oauth2.0``` – Google OAuth 2.0 strategy for Passport.js  
-- ```nodemailer``` – Sending transactional emails (password reset, newsletter, etc.)  
-- ```cors``` – Controlled cross-origin access between front and back ends  
-- ```helmet``` – Sets secure HTTP headers for protection  
-- ```bcrypt``` – Password hashing  
-- ```csurf``` – CSRF protection  
-- ```express-validator``` – Input sanitization and validation  
-- ```Prettier``` – Code formatter for consistent styling  
-- ```ESLint``` – Linting tool to catch bugs and enforce code quality  
-- ```Northflank``` – Backend hosting platform  
-- ```Supabase``` – Hosting for the PostgreSQL DB
-- ```Cloudflare``` – DNS management, CDN caching, SSL, and security 
+- `Node.js` – Runtime environment
+- `Express` – Web framework
+- `PostgreSQL` – Relational database (via Supabase)
+- `express-session` – Session management
+- `Passport.js` – Authentication middleware (session-based)
+- `google-passport-oauth2.0` – Google OAuth 2.0 strategy for Passport.js
+- `nodemailer` – Sending transactional emails (password reset, newsletter, etc.)
+- `cors` – Controlled cross-origin access between front and back ends
+- `helmet` – Sets secure HTTP headers for protection
+- `bcrypt` – Password hashing
+- `csurf` – CSRF protection
+- `express-validator` – Input sanitization and validation
+- `Prettier` – Code formatter for consistent styling
+- `ESLint` – Linting tool to catch bugs and enforce code quality
+- `Northflank` – Backend hosting platform
+- `Supabase` – Hosting for the PostgreSQL DB
+- `Cloudflare` – DNS management, CDN caching, SSL, and security
 
 ---
 
@@ -139,10 +137,10 @@ guitar-shop-backend/
 
 ### ✉️ Newsletter
 
-| Method | Endpoint                        | Description                       |
-| ------ | ------------------------------- | --------------------------------- |
-| POST   | `/newsletter/subscribe`         | Subscribe to the newsletter       |
-| GET    | `/newsletter/unsubscribe/:token`| Unsubscribe from the newsletter   |
+| Method | Endpoint                         | Description                     |
+| ------ | -------------------------------- | ------------------------------- |
+| POST   | `/newsletter/subscribe`          | Subscribe to the newsletter     |
+| GET    | `/newsletter/unsubscribe/:token` | Unsubscribe from the newsletter |
 
 ### 🛡️ CSRF
 
@@ -153,7 +151,6 @@ guitar-shop-backend/
 ## 🧷 CSRF Protection
 
 All forms or API calls from the frontend must include a CSRF token.
-
 
 # 🧑‍💻 Local Setup
 
@@ -178,7 +175,7 @@ npm install
 cp .env.example .env
 ```
 
-* Open `.env` and replace the placeholder values with your local settings.
+- Open `.env` and replace the placeholder values with your local settings.
 
 4. **Initialize the database**
 
@@ -200,7 +197,6 @@ npm run dev
 
 The backend should now be running at `http://localhost:3000`.  
 If you need the frontend, you can get the repo [here](https://github.com/JordanDonguy/guitar-shop-frontend).
-
 
 ## 📄 License
 
